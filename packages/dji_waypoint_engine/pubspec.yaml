@@ -1,0 +1,10 @@
+name: dji_waypoint_engine
+description: A package to generate DJI Waypoint Missions compatible with DJI Fly and DJI Pilot
+version: 0.0.1
+
+environment:
+  sdk: "^3.0.0"
+
+dependencies:
+  archive: ^3.6.1
+  xml: ^6.5.0

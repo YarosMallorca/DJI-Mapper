@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget {
       required this.min,
       required this.max,
       required this.defaultValue,
+      required this.onChanged,
       this.decimal});
 
   final String labelText;
@@ -15,6 +16,7 @@ class CustomTextField extends StatelessWidget {
   final double max;
   final double defaultValue;
   final bool? decimal;
+  final void Function(double) onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +28,7 @@ class CustomTextField extends StatelessWidget {
           keyboardType: TextInputType.number,
           min: min,
           max: max,
+          onChanged: onChanged,
           value: defaultValue,
           decoration: InputDecoration(
             labelText: labelText,
