@@ -30,6 +30,7 @@ dependencies:
   universal_io: ^2.2.2
   url_launcher: ^6.3.0
   geolocator: ^12.0.0
+  dio: ^5.5.0+1
 
 dev_dependencies:
   flutter_test:

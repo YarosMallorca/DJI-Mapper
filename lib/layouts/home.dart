@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:dio/dio.dart';
 import 'package:dji_mapper/components/app_bar.dart';
 import 'package:dji_mapper/core/drone_mapping_engine.dart';
 import 'package:dji_mapper/layouts/aircraft.dart';
@@ -6,6 +9,7 @@ import 'package:dji_mapper/layouts/export.dart';
 import 'package:dji_mapper/layouts/info.dart';
 import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
@@ -26,11 +30,49 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
 
   final List<Marker> _photoMarkers = [];
 
+  final _debounce = const Duration(milliseconds: 800);
+  Timer? _debounceTimer;
+  List<MapSearchLocation> _searchLocations = [];
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _getLocationAndMoveMap();
+  }
+
+  Future<void> _search(String query) async {
+    var response = await Dio().get(
+      "https://nominatim.openstreetmap.org/search",
+      queryParameters: {
+        "q": query,
+        "format": "jsonv2",
+      },
+    );
+
+    List<MapSearchLocation> locations = [];
+    for (var location in response.data) {
+      locations.add(MapSearchLocation(
+        name: location["display_name"],
+        type: location["type"],
+        location: LatLng(
+            double.parse(location["lat"]), double.parse(location["lon"])),
+      ));
+    }
+
+    setState(() {
+      _searchLocations = locations;
+    });
+  }
+
+  void _onSearchChanged(
+      String query, Function(List<MapSearchLocation>) callback) {
+    if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+    _debounceTimer = Timer(_debounce, () async {
+      await _search(query);
+
+      callback(_searchLocations);
+    });
   }
 
   void _getLocationAndMoveMap() async {
@@ -40,7 +82,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
     }
     final location = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.low);
-    mapController.move(LatLng(location.latitude, location.longitude), 15);
+    mapController.move(LatLng(location.latitude, location.longitude), 14);
   }
 
   @override
@@ -133,6 +175,128 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                 PolylineLayer(polylines: [
                   listenables.flightLine ?? Polyline(points: [])
                 ]),
+                DragMarkers(markers: [
+                  for (var point in listenables.polygon)
+                    DragMarker(
+                      size: const Size(30, 30),
+                      point: point,
+                      alignment: Alignment.topCenter,
+                      builder: (_, coords, b) => GestureDetector(
+                          onSecondaryTap: () => setState(() {
+                                if (listenables.polygon.contains(point)) {
+                                  listenables.polygon.remove(point);
+                                }
+                              }),
+                          child: const Icon(Icons.place, size: 30)),
+                      onDragUpdate: (details, latLng) => {
+                        if (listenables.polygon.contains(point))
+                          {
+                            listenables.polygon[
+                                listenables.polygon.indexOf(point)] = latLng
+                          }
+                      },
+                    ),
+                ]),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 300),
+                      child: Autocomplete<MapSearchLocation>(
+                        optionsBuilder: (textEditingValue) {
+                          return Future.delayed(_debounce, () async {
+                            _onSearchChanged(textEditingValue.text,
+                                (locations) => locations);
+                            return _searchLocations;
+                          });
+                        },
+                        onSelected: (option) =>
+                            mapController.move(option.location, 12),
+                        optionsViewBuilder: (context, onSelected, options) {
+                          return Align(
+                              alignment: Alignment.topLeft,
+                              child: Material(
+                                  elevation: 4.0,
+                                  child: ConstrainedBox(
+                                      constraints: const BoxConstraints(
+                                          maxHeight: 200, maxWidth: 600),
+                                      child: ListView.builder(
+                                        padding: EdgeInsets.zero,
+                                        shrinkWrap: true,
+                                        itemCount: options.length,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          final option =
+                                              options.elementAt(index);
+                                          return InkWell(
+                                            onTap: () {
+                                              onSelected(option);
+                                            },
+                                            child: Builder(builder:
+                                                (BuildContext context) {
+                                              final bool highlight =
+                                                  AutocompleteHighlightedOption
+                                                          .of(context) ==
+                                                      index;
+                                              if (highlight) {
+                                                SchedulerBinding.instance
+                                                    .addPostFrameCallback(
+                                                        (Duration timeStamp) {
+                                                  Scrollable.ensureVisible(
+                                                      context,
+                                                      alignment: 0.5);
+                                                });
+                                              }
+                                              return Container(
+                                                color: highlight
+                                                    ? Theme.of(context)
+                                                        .focusColor
+                                                    : null,
+                                                padding:
+                                                    const EdgeInsets.all(16.0),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      option.name,
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }),
+                                          );
+                                        },
+                                      ))));
+                        },
+                        displayStringForOption: (option) => option.name,
+                        fieldViewBuilder: (context, textEditingController,
+                                focusNode, onFieldSubmitted) =>
+                            TextFormField(
+                          controller: textEditingController,
+                          focusNode: focusNode,
+                          onFieldSubmitted: (value) async {
+                            await _search(textEditingController.text);
+                            mapController.move(
+                                _searchLocations.first.location, 12);
+                          },
+                          decoration: InputDecoration(
+                              hintText: 'Search location',
+                              border: const OutlineInputBorder(),
+                              filled: true,
+                              suffixIcon: IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () => textEditingController.clear(),
+                              ),
+                              fillColor: Theme.of(context).colorScheme.surface),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 Align(
                   alignment: Alignment.bottomRight,
                   child: Row(
@@ -163,28 +327,6 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-                DragMarkers(markers: [
-                  for (var point in listenables.polygon)
-                    DragMarker(
-                      size: const Size(30, 30),
-                      point: point,
-                      alignment: Alignment.topCenter,
-                      builder: (_, coords, b) => GestureDetector(
-                          onSecondaryTap: () => setState(() {
-                                if (listenables.polygon.contains(point)) {
-                                  listenables.polygon.remove(point);
-                                }
-                              }),
-                          child: const Icon(Icons.place, size: 30)),
-                      onDragUpdate: (details, latLng) => {
-                        if (listenables.polygon.contains(point))
-                          {
-                            listenables.polygon[
-                                listenables.polygon.indexOf(point)] = latLng
-                          }
-                      },
-                    ),
-                ]),
               ],
             ),
           ),
@@ -223,4 +365,13 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       },
     );
   }
+}
+
+class MapSearchLocation {
+  final String name;
+  final String type;
+  final LatLng location;
+
+  MapSearchLocation(
+      {required this.name, required this.type, required this.location});
 }
