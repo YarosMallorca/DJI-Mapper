@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dji_waypoint_engine/engine.dart';
-import 'package:dji_waypoint_mapping/shared/value_listeneables.dart';
+import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:provider/provider.dart';

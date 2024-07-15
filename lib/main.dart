@@ -1,6 +1,6 @@
-import 'package:dji_waypoint_mapping/layouts/home.dart';
-import 'package:dji_waypoint_mapping/shared/theme_manager.dart';
-import 'package:dji_waypoint_mapping/shared/value_listeneables.dart';
+import 'package:dji_mapper/layouts/home.dart';
+import 'package:dji_mapper/shared/theme_manager.dart';
+import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

@@ -1,4 +1,4 @@
-import 'package:dji_waypoint_mapping/shared/theme_manager.dart';
+import 'package:dji_mapper/shared/theme_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

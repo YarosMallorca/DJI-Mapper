@@ -1,4 +1,4 @@
-name: dji_waypoint_mapping
+name: dji_mapper
 description: "Plan Survey & Photogrammetry Missions to use directly on your DJI Drone from the DJI Fly app"
 
 publish_to: "none"

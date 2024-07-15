@@ -1,10 +1,10 @@
-import 'package:dji_waypoint_mapping/components/app_bar.dart';
-import 'package:dji_waypoint_mapping/core/drone_mapping_engine.dart';
-import 'package:dji_waypoint_mapping/layouts/aircraft.dart';
-import 'package:dji_waypoint_mapping/layouts/camera.dart';
-import 'package:dji_waypoint_mapping/layouts/export.dart';
-import 'package:dji_waypoint_mapping/layouts/info.dart';
-import 'package:dji_waypoint_mapping/shared/value_listeneables.dart';
+import 'package:dji_mapper/components/app_bar.dart';
+import 'package:dji_mapper/core/drone_mapping_engine.dart';
+import 'package:dji_mapper/layouts/aircraft.dart';
+import 'package:dji_mapper/layouts/camera.dart';
+import 'package:dji_mapper/layouts/export.dart';
+import 'package:dji_mapper/layouts/info.dart';
+import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';

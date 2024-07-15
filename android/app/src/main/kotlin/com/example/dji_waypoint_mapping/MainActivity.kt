@@ -1,4 +1,4 @@
-package com.example.dji_waypoint_mapping
+package com.example.dji_mapper
 
 import io.flutter.embedding.android.FlutterActivity
 

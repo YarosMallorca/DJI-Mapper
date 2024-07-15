@@ -1,5 +1,5 @@
-import 'package:dji_waypoint_mapping/core/drone_mapping_engine.dart';
-import 'package:dji_waypoint_mapping/shared/value_listeneables.dart';
+import 'package:dji_mapper/core/drone_mapping_engine.dart';
+import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

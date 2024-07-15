@@ -1,5 +1,5 @@
-import 'package:dji_waypoint_mapping/components/text_field.dart';
-import 'package:dji_waypoint_mapping/shared/value_listeneables.dart';
+import 'package:dji_mapper/components/text_field.dart';
+import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
