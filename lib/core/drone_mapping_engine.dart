@@ -169,6 +169,30 @@ class DroneMappingEngine {
     return totalDistance;
   }
 
+  static String calculateRecommendedShutterSpeed({
+    required int altitude, // in meters
+    required double sensorWidth, // in meters
+    required double focalLength, // in meters
+    required int imageWidth, // in pixels
+    required double droneSpeed, // in meters per second (m/s)
+  }) {
+    // Calculate Ground Sampling Distance (GSD) in meters/pixel
+    double gsd = (altitude * sensorWidth) / (imageWidth * focalLength);
+
+    // Calculate recommended shutter speed to avoid motion blur (in seconds)
+    double shutterSpeed = gsd / droneSpeed;
+
+    // Find the closest standard speed
+    double closest = _standardSpeeds.first;
+    for (double speed in _standardSpeeds) {
+      if ((shutterSpeed - speed).abs() < (shutterSpeed - closest).abs()) {
+        closest = speed;
+      }
+    }
+
+    return '1/${(1 / closest).toInt()}';
+  }
+
   static double _haversineDistance(LatLng p1, LatLng p2) {
     const R = 6371e3; // Earth radius in meters
     final phi1 = p1.latitudeInRad;
@@ -182,6 +206,46 @@ class DroneMappingEngine {
 
     return R * c; // Distance in meters
   }
+
+  static final List<double> _standardSpeeds = [
+    1 / 16000,
+    1 / 8000,
+    1 / 6400,
+    1 / 5000,
+    1 / 4000,
+    1 / 3200,
+    1 / 2500,
+    1 / 2000,
+    1 / 1600,
+    1 / 1250,
+    1 / 1000,
+    1 / 800,
+    1 / 640,
+    1 / 500,
+    1 / 400,
+    1 / 320,
+    1 / 240,
+    1 / 200,
+    1 / 160,
+    1 / 120,
+    1 / 100,
+    1 / 80,
+    1 / 60,
+    1 / 50,
+    1 / 40,
+    1 / 30,
+    1 / 25,
+    1 / 20,
+    1 / 15,
+    1 / 12.5,
+    1 / 10,
+    1 / 8,
+    1 / 6.25,
+    1 / 5,
+    1 / 4,
+    1 / 3,
+    1 / 2,
+  ];
 }
 
 extension on double {

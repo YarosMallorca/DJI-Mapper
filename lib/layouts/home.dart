@@ -7,7 +7,9 @@ import 'package:dji_mapper/layouts/info.dart';
 import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
@@ -28,6 +30,17 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _getLocationAndMoveMap();
+  }
+
+  void _getLocationAndMoveMap() async {
+    if (await Geolocator.isLocationServiceEnabled() == false) return;
+    if (await Geolocator.checkPermission() == LocationPermission.denied) {
+      await Geolocator.requestPermission();
+    }
+    final location = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.low);
+    mapController.move(LatLng(location.latitude, location.longitude), 15);
   }
 
   @override
@@ -93,11 +106,10 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                     listenables.polygon.add(point);
                   }),
                 },
-                initialCenter: const LatLng(39.586550, 3.374027),
-                initialZoom: 12,
               ),
               children: [
                 TileLayer(
+                  tileProvider: CancellableNetworkTileProvider(),
                   tileBuilder: Theme.of(context).brightness == Brightness.dark
                       ? (context, tileWidget, tile) =>
                           darkModeTileBuilder(context, tileWidget, tile)

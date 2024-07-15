@@ -138,4 +138,6 @@ class ValueListenables extends ChangeNotifier {
     _flightLine.value = value;
     notifyListeners();
   }
+
+  void notify() => notifyListeners();
 }

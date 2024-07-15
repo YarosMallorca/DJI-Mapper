@@ -17,11 +17,20 @@ class _InfoState extends State<Info> {
         Consumer<ValueListenables>(builder: (context, listenables, child) {
       var totalDistance = 0;
       var area = 0;
+      var recommendedShutterSpeed = "0";
       if (listenables.polygon.length > 2) {
         totalDistance = DroneMappingEngine.calculateTotalDistance(
                 listenables.flightLine?.points ?? [])
             .round();
         area = DroneMappingEngine.calculateArea(listenables.polygon).round();
+        recommendedShutterSpeed =
+            DroneMappingEngine.calculateRecommendedShutterSpeed(
+          altitude: listenables.altitude,
+          sensorWidth: listenables.sensorWidth,
+          focalLength: listenables.focalLength,
+          imageWidth: listenables.imageWidth,
+          droneSpeed: listenables.speed,
+        );
       }
 
       return Column(
@@ -49,6 +58,10 @@ class _InfoState extends State<Info> {
               const Divider(),
               Text(
                   "Estimated flight time: ${(((totalDistance / listenables.speed) + (listenables.photoLocations.length * listenables.delayAtWaypoint)) / 60).round()} minutes",
+                  style: const TextStyle(fontSize: 16)),
+              const Divider(),
+              Text(
+                  "Recommended shutter speed: $recommendedShutterSpeed or faster",
                   style: const TextStyle(fontSize: 16)),
             ]),
           ))

@@ -1,6 +1,7 @@
 import 'package:dji_mapper/shared/theme_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MappingAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MappingAppBar({super.key});
@@ -9,7 +10,7 @@ class MappingAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Consumer<ThemeManager>(
       builder: (context, theme, child) => AppBar(
-        title: const Text("DJI Waypoint Mapping"),
+        title: const Text("DJI Mapper"),
         elevation: 10,
         actions: [
           PopupMenuButton(
@@ -37,6 +38,9 @@ class MappingAppBar extends StatelessWidget implements PreferredSizeWidget {
                 case "theme":
                   theme.toggleTheme();
                   break;
+                case "github":
+                  launchUrl(
+                      Uri.https("github.com", "YarosMallorca/DJI-Mapper"));
               }
             },
           )

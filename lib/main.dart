@@ -1,11 +1,18 @@
 import 'package:dji_mapper/layouts/home.dart';
+import 'package:dji_mapper/presets/preset_manager.dart';
 import 'package:dji_mapper/shared/theme_manager.dart';
 import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+late SharedPreferences prefs;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  prefs = await SharedPreferences.getInstance();
+  PresetManager.init();
   runApp(const MyApp());
 }
 

@@ -9,6 +9,7 @@ class CustomTextField extends StatelessWidget {
       required this.max,
       required this.defaultValue,
       required this.onChanged,
+      this.enabled = true,
       this.decimal});
 
   final String labelText;
@@ -16,6 +17,7 @@ class CustomTextField extends StatelessWidget {
   final double max;
   final double defaultValue;
   final bool? decimal;
+  final bool enabled;
   final void Function(double) onChanged;
 
   @override
@@ -23,6 +25,7 @@ class CustomTextField extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: SpinBox(
+          enabled: enabled,
           step: decimal != null ? 0.1 : 1,
           decimals: decimal != null ? 1 : 0,
           keyboardType: TextInputType.number,

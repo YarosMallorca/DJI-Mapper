@@ -1,8 +1,10 @@
-import 'dart:io';
-
+import 'package:universal_io/io.dart';
+import 'package:universal_html/html.dart' as html;
+import 'package:archive/archive.dart';
 import 'package:dji_waypoint_engine/engine.dart';
 import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Action;
 import 'package:provider/provider.dart';
 
@@ -64,23 +66,63 @@ class ExportBarState extends State<ExportBar> {
                 speed: listenables.speed,
                 placemarks: placemarks)));
 
-    String? outputFile = await FilePicker.platform.saveFile(
-        dialogTitle: 'Export DJI Fly Mission',
-        fileName: 'output.kmz',
-        allowedExtensions: ['kmz'],
-        type: FileType.custom);
+    var templateString = template.toXmlString(pretty: true);
+    var waylinesString = waylines.toXmlString(pretty: true);
 
-    if (outputFile == null && mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Export cancelled")));
-    } else {
-      createDJIFile(
-          template: template, waylines: waylines, filePath: File(outputFile!));
+    var encoder = ZipEncoder();
+    var archive = Archive();
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Mission exported successfully")));
+    archive.addFile(ArchiveFile('template.kml', templateString.length,
+        Uint8List.fromList(templateString.codeUnits)));
+
+    archive.addFile(ArchiveFile('waylines.wpml', waylinesString.length,
+        Uint8List.fromList(waylinesString.codeUnits)));
+
+    var zipData = encoder.encode(archive);
+    var zipBytes = Uint8List.fromList(zipData!);
+
+    String? outputPath;
+
+    if (!kIsWeb) {
+      outputPath = await FilePicker.platform.saveFile(
+          type: FileType.custom,
+          fileName: "output",
+          allowedExtensions: ["kmz"],
+          dialogTitle: "Save Mission");
+
+      if (outputPath == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Mission export cancelled")));
+        }
+        return;
       }
+    } else {
+      outputPath = "output.kmz";
+    }
+
+    // Add code here
+
+    if (!kIsWeb) {
+      if (!outputPath.endsWith(".kmz")) {
+        outputPath += ".kmz";
+      }
+      // Save file for non-web platforms
+      final file = File(outputPath);
+      await file.writeAsBytes(zipBytes);
+    } else {
+      // Save file for web platform
+      final blob = html.Blob([zipBytes], 'application/octet-stream');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      html.AnchorElement(href: url)
+        ..setAttribute("download", "output.kmz")
+        ..click();
+      html.Url.revokeObjectUrl(url);
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Mission exported successfully")));
     }
   }
 
