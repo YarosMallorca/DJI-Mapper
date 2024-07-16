@@ -16,7 +16,7 @@ A cross-platform tool to plan and create automatic Survey/Photogrammetry mission
 
 1. Download the latest version from the [Releases](https://github.com/YarosMallorca/DJI-Mapper/releases/latest) page.
 
-2. If you're on Windows, unzip the downloaded file and run `DJI Mapper.exe`. On MacOS simply double-click the downloaded file. On Linux run `DJI-Mapper` from the terminal.
+2. Unzip the downloaded file and run the executable. On Linux run `DJI-Mapper` from the terminal.
 
 3. If you're on Windows and you get a warning from Windows Defender, click on "More info" and then "Run anyway".
 
@@ -29,11 +29,11 @@ A cross-platform tool to plan and create automatic Survey/Photogrammetry mission
 5. On the Info tab, you can see general info about the mission.
 6. On the Export tab, click the button to export the mission to a file.
 7. Load the mission on your drone and start the mission. (detailed instructions coming soon)
-   _Note: Do not modify or save the mission from inside DJI Fly, beucase it doesn't support straight curves, and will break the mission._
+   _Note: Do not modify or save the mission from inside DJI Fly, because it doesn't support straight curves, and will break the mission._
 
 ## Contributing
 
-Contributions are most welcome! If you have any ideas, suggestions or issues, please open an issue or a pull request.
+Contributions are most welcome! If you have any ideas, suggestions, or issues, please open an issue or a pull request.
 
 ## Building from source
 
