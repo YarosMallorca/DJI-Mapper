@@ -2,7 +2,11 @@
 
 A cross-platform tool to plan and create automatic Survey/Photogrammetry missions for DJI Drones with Waypoints!
 
-![Home page Screenshot](https://github.com/user-attachments/assets/127ec817-1c62-4cfb-a5d2-a6c1801238a4)
+<div>
+<img src="https://github.com/user-attachments/assets/127ec817-1c62-4cfb-a5d2-a6c1801238a4" height="300px" />
+<img src="https://github.com/user-attachments/assets/7ba5ac8f-bac7-4c4c-9671-a2c3f7f0207d" height="300px" />
+
+</div>
 
 ## Features
 
@@ -28,8 +32,9 @@ A cross-platform tool to plan and create automatic Survey/Photogrammetry mission
 4. Select the camera you're using from the presets, or create a custom one.
 5. On the Info tab, you can see general info about the mission.
 6. On the Export tab, click the button to export the mission to a file.
-7. Load the mission on your drone and start the mission. (detailed instructions coming soon)
-   _Note: Do not modify or save the mission from inside DJI Fly, because it doesn't support straight curves, and will break the mission._
+7. Load the mission on your drone and start the mission. ([detailed details here](https://mavicpilots.com/threads/waypoints-how-to-back-up-export-import.135283/))
+
+_Note: Do not modify or save the mission from inside DJI Fly, because it doesn't support straight curves, and will break the mission._
 
 ## Contributing
 
