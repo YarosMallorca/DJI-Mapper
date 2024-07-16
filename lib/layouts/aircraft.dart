@@ -1,3 +1,4 @@
+import 'package:dji_mapper/shared/aircraft_settings.dart';
 import 'package:dji_waypoint_engine/engine.dart';
 import 'package:dji_mapper/components/text_field.dart';
 import 'package:dji_mapper/shared/value_listeneables.dart';
@@ -12,6 +13,39 @@ class AircraftBar extends StatefulWidget {
 }
 
 class _AircraftBarState extends State<AircraftBar> {
+  @override
+  void initState() {
+    final listenables = Provider.of<ValueListenables>(context, listen: false);
+
+    final settings = AircraftSettings.getAircraftSettings();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      listenables.altitude = settings.altitude;
+      listenables.speed = settings.speed;
+      listenables.forwardOverlap = settings.forwardOverlap;
+      listenables.sideOverlap = settings.sideOverlap;
+      listenables.rotation = settings.rotation;
+      listenables.delayAtWaypoint = settings.delay;
+      listenables.onFinished = settings.finishAction;
+      listenables.rcLostAction = settings.rcLostAction;
+    });
+
+    super.initState();
+  }
+
+  void _updateSettings(ValueListenables listenables) {
+    AircraftSettings.saveAircraftSettings(AircraftSettings(
+      altitude: listenables.altitude,
+      speed: listenables.speed,
+      forwardOverlap: listenables.forwardOverlap,
+      sideOverlap: listenables.sideOverlap,
+      rotation: listenables.rotation,
+      delay: listenables.delayAtWaypoint,
+      finishAction: listenables.onFinished,
+      rcLostAction: listenables.rcLostAction,
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ValueListenables>(builder: (context, listenables, child) {
@@ -29,14 +63,20 @@ class _AircraftBarState extends State<AircraftBar> {
                         labelText: "Altitude (m)",
                         min: 10,
                         max: 500,
-                        onChanged: (m) => listenables.altitude = m.round(),
+                        onChanged: (m) {
+                          listenables.altitude = m.round();
+                          _updateSettings(listenables);
+                        },
                         defaultValue: listenables.altitude.toDouble()),
                     CustomTextField(
                         labelText: "Speed (m/s)",
                         min: 0.1,
                         max: 9,
                         defaultValue: listenables.speed,
-                        onChanged: (speed) => listenables.speed = speed,
+                        onChanged: (speed) {
+                          listenables.speed = speed;
+                          _updateSettings(listenables);
+                        },
                         decimal: true),
                   ],
                 ),
@@ -54,24 +94,30 @@ class _AircraftBarState extends State<AircraftBar> {
                       min: 1,
                       max: 90,
                       defaultValue: listenables.forwardOverlap.toDouble(),
-                      onChanged: (percent) =>
-                          listenables.forwardOverlap = percent.round(),
+                      onChanged: (percent) {
+                        listenables.forwardOverlap = percent.round();
+                        _updateSettings(listenables);
+                      },
                     ),
                     CustomTextField(
                       labelText: "Sidelap (%)",
                       min: 1,
                       max: 90,
                       defaultValue: listenables.sideOverlap.toDouble(),
-                      onChanged: (percent) =>
-                          listenables.sideOverlap = percent.round(),
+                      onChanged: (percent) {
+                        listenables.sideOverlap = percent.round();
+                        _updateSettings(listenables);
+                      },
                     ),
                     CustomTextField(
                       labelText: "Rotation (deg)",
                       min: 0,
                       max: 360,
                       defaultValue: listenables.rotation.toDouble(),
-                      onChanged: (degrees) =>
-                          listenables.rotation = degrees.round(),
+                      onChanged: (degrees) {
+                        listenables.rotation = degrees.round();
+                        _updateSettings(listenables);
+                      },
                     ),
                   ],
                 ),
@@ -83,8 +129,10 @@ class _AircraftBarState extends State<AircraftBar> {
                 min: 0,
                 max: 10,
                 defaultValue: listenables.delayAtWaypoint.toDouble(),
-                onChanged: (delaySeconds) =>
-                    listenables.delayAtWaypoint = delaySeconds.round(),
+                onChanged: (delaySeconds) {
+                  listenables.delayAtWaypoint = delaySeconds.round();
+                  _updateSettings(listenables);
+                },
               ),
             ),
             Card(
@@ -110,6 +158,7 @@ class _AircraftBarState extends State<AircraftBar> {
                             setState(() {
                               listenables.onFinished = FinishAction.noAction;
                             });
+                            _updateSettings(listenables);
                           }),
                       ChoiceChip(
                           label: const Text('RTH'),
@@ -119,6 +168,7 @@ class _AircraftBarState extends State<AircraftBar> {
                             setState(() {
                               listenables.onFinished = FinishAction.goHome;
                             });
+                            _updateSettings(listenables);
                           }),
                       ChoiceChip(
                           label: const Text('Land'),
@@ -128,6 +178,7 @@ class _AircraftBarState extends State<AircraftBar> {
                             setState(() {
                               listenables.onFinished = FinishAction.autoLand;
                             });
+                            _updateSettings(listenables);
                           }),
                       ChoiceChip(
                           label: const Text('Go to first waypoint'),
@@ -138,6 +189,7 @@ class _AircraftBarState extends State<AircraftBar> {
                               listenables.onFinished =
                                   FinishAction.gotoFirstWaypoint;
                             });
+                            _updateSettings(listenables);
                           })
                     ]),
                     const Divider(),
@@ -158,6 +210,7 @@ class _AircraftBarState extends State<AircraftBar> {
                             setState(() {
                               listenables.rcLostAction = RCLostAction.hover;
                             });
+                            _updateSettings(listenables);
                           }),
                       ChoiceChip(
                           label: const Text('RTH'),
@@ -167,6 +220,7 @@ class _AircraftBarState extends State<AircraftBar> {
                             setState(() {
                               listenables.rcLostAction = RCLostAction.goBack;
                             });
+                            _updateSettings(listenables);
                           }),
                       ChoiceChip(
                           label: const Text('Land'),
@@ -176,6 +230,7 @@ class _AircraftBarState extends State<AircraftBar> {
                             setState(() {
                               listenables.rcLostAction = RCLostAction.landing;
                             });
+                            _updateSettings(listenables);
                           }),
                     ]),
                   ],
