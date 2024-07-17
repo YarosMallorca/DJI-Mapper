@@ -139,7 +139,7 @@ class ExportBarState extends State<ExportBar> {
           height: listenables.altitude,
           speed: listenables.speed,
           headingParam: HeadingParam(
-              headingMode: HeadingMode.smoothTransition,
+              headingMode: HeadingMode.followWayline,
               headingPathMode: HeadingPathMode.followBadArc),
           turnParam: TurnParam(
               waypointTurnMode:
