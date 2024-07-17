@@ -10,6 +10,7 @@ class AircraftSettings {
   int sideOverlap;
   int rotation;
   int delay;
+  int cameraAngle;
   FinishAction finishAction;
   RCLostAction rcLostAction;
 
@@ -20,6 +21,7 @@ class AircraftSettings {
     required this.sideOverlap,
     required this.rotation,
     required this.delay,
+    required this.cameraAngle,
     required this.finishAction,
     required this.rcLostAction,
   });
@@ -32,6 +34,7 @@ class AircraftSettings {
       'sideOverlap': sideOverlap,
       'rotation': rotation,
       'delay': delay,
+      'cameraAngle': cameraAngle,
       'finishAction': finishAction.name,
       'rcLostAction': rcLostAction.name,
     };
@@ -39,12 +42,13 @@ class AircraftSettings {
 
   factory AircraftSettings.fromJson(Map<String, dynamic> json) {
     return AircraftSettings(
-      altitude: json['altitude'],
-      speed: json['speed'],
-      forwardOverlap: json['forwardOverlap'],
-      sideOverlap: json['sideOverlap'],
-      rotation: json['rotation'],
-      delay: json['delay'],
+      altitude: json['altitude'] ?? 50,
+      speed: json['speed'] ?? 4.0,
+      forwardOverlap: json['forwardOverlap'] ?? 60,
+      sideOverlap: json['sideOverlap'] ?? 40,
+      rotation: json['rotation'] ?? 0,
+      delay: json['delay'] ?? 0,
+      cameraAngle: json['cameraAngle'] ?? -90,
       finishAction: FinishAction.values.firstWhere(
           (e) => e.name == json['finishAction'],
           orElse: () => FinishAction.noAction),
@@ -61,6 +65,7 @@ class AircraftSettings {
     sideOverlap: 40,
     rotation: 0,
     delay: 0,
+    cameraAngle: -90,
     finishAction: FinishAction.noAction,
     rcLostAction: RCLostAction.hover,
   );

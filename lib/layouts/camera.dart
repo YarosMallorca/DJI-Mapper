@@ -15,20 +15,17 @@ class CameraBar extends StatefulWidget {
 class _CameraBarState extends State<CameraBar> {
   late List<CameraPreset> _presets;
 
-  late CameraPreset _selectedPreset;
-
   @override
   void initState() {
     super.initState();
     _presets = PresetManager.getPresets();
-    _selectedPreset = _presets[0];
   }
 
   void _updatePreset(ValueListenables listenables) {
     PresetManager.updatePreset(
-        _presets.indexOf(_selectedPreset),
+        _presets.indexOf(listenables.selectedCameraPreset!),
         CameraPreset(
-            name: _selectedPreset.name,
+            name: listenables.selectedCameraPreset!.name,
             defaultPreset: false,
             sensorWidth: listenables.sensorWidth,
             sensorHeight: listenables.sensorHeight,
@@ -50,7 +47,8 @@ class _CameraBarState extends State<CameraBar> {
         imageHeight: listenables.imageHeight);
     PresetManager.addPreset(newPreset);
     _presets = PresetManager.getPresets();
-    _selectedPreset = newPreset;
+    Provider.of<ValueListenables>(context, listen: false).selectedCameraPreset =
+        newPreset;
     listenables.notify();
     Navigator.pop(context);
   }
@@ -68,7 +66,7 @@ class _CameraBarState extends State<CameraBar> {
                 const Text("Camera Preset:"),
                 const SizedBox(width: 10),
                 DropdownButton(
-                    value: _selectedPreset,
+                    value: listenables.selectedCameraPreset,
                     items: List.generate(
                         _presets.length,
                         (i) => DropdownMenuItem(
@@ -76,14 +74,19 @@ class _CameraBarState extends State<CameraBar> {
                               child: Text(_presets[i].name),
                             )),
                     onChanged: (item) {
-                      _selectedPreset = item ?? _presets[0];
+                      listenables.selectedCameraPreset = item ?? _presets[0];
 
                       // Update listenables
-                      listenables.sensorWidth = _selectedPreset.sensorWidth;
-                      listenables.sensorHeight = _selectedPreset.sensorHeight;
-                      listenables.focalLength = _selectedPreset.focalLength;
-                      listenables.imageWidth = _selectedPreset.imageWidth;
-                      listenables.imageHeight = _selectedPreset.imageHeight;
+                      listenables.sensorWidth =
+                          listenables.selectedCameraPreset!.sensorWidth;
+                      listenables.sensorHeight =
+                          listenables.selectedCameraPreset!.sensorHeight;
+                      listenables.focalLength =
+                          listenables.selectedCameraPreset!.focalLength;
+                      listenables.imageWidth =
+                          listenables.selectedCameraPreset!.imageWidth;
+                      listenables.imageHeight =
+                          listenables.selectedCameraPreset!.imageHeight;
                     }),
                 const SizedBox(
                   width: 6,
@@ -121,18 +124,20 @@ class _CameraBarState extends State<CameraBar> {
                   tooltip: "Add",
                 ),
                 IconButton(
-                  onPressed: _selectedPreset.defaultPreset
+                  onPressed: listenables.selectedCameraPreset!.defaultPreset
                       ? null
                       : () {
-                          final int previousIndex =
-                              _presets.indexOf(_selectedPreset);
-                          PresetManager.deletePreset(_selectedPreset);
+                          final int previousIndex = _presets
+                              .indexOf(listenables.selectedCameraPreset!);
+                          PresetManager.deletePreset(
+                              listenables.selectedCameraPreset!);
                           _presets = PresetManager.getPresets();
-                          _selectedPreset = _presets[previousIndex - 1];
+                          listenables.selectedCameraPreset =
+                              _presets[previousIndex - 1];
                           listenables.notify();
                         },
                   icon: const Icon(Icons.delete),
-                  tooltip: _selectedPreset.defaultPreset
+                  tooltip: listenables.selectedCameraPreset!.defaultPreset
                       ? "Can't delete default preset"
                       : "Delete",
                 ),
@@ -155,7 +160,7 @@ class _CameraBarState extends State<CameraBar> {
                       },
                       defaultValue: listenables.sensorWidth,
                       decimal: true,
-                      enabled: !_selectedPreset.defaultPreset,
+                      enabled: !listenables.selectedCameraPreset!.defaultPreset,
                     ),
                     CustomTextField(
                       labelText: "Sensor Height (mm)",
@@ -167,7 +172,7 @@ class _CameraBarState extends State<CameraBar> {
                         _updatePreset(listenables);
                       },
                       decimal: true,
-                      enabled: !_selectedPreset.defaultPreset,
+                      enabled: !listenables.selectedCameraPreset!.defaultPreset,
                     ),
                     CustomTextField(
                       labelText: "Focal Length (mm)",
@@ -179,7 +184,7 @@ class _CameraBarState extends State<CameraBar> {
                         _updatePreset(listenables);
                       },
                       decimal: true,
-                      enabled: !_selectedPreset.defaultPreset,
+                      enabled: !listenables.selectedCameraPreset!.defaultPreset,
                     ),
                   ],
                 ),
@@ -198,14 +203,16 @@ class _CameraBarState extends State<CameraBar> {
                       max: 10000,
                       onChanged: (px) {
                         listenables.imageWidth = px.toInt();
-                        _presets[_presets.indexOf(_selectedPreset)].imageWidth =
-                            px.toInt();
+                        _presets[_presets
+                                .indexOf(listenables.selectedCameraPreset!)]
+                            .imageWidth = px.toInt();
                         PresetManager.updatePreset(
-                            _presets.indexOf(_selectedPreset),
-                            _presets[_presets.indexOf(_selectedPreset)]);
+                            _presets.indexOf(listenables.selectedCameraPreset!),
+                            _presets[_presets
+                                .indexOf(listenables.selectedCameraPreset!)]);
                       },
                       defaultValue: listenables.imageWidth.toDouble(),
-                      enabled: !_selectedPreset.defaultPreset,
+                      enabled: !listenables.selectedCameraPreset!.defaultPreset,
                     ),
                     CustomTextField(
                       labelText: "Image Height (px)",
@@ -214,10 +221,11 @@ class _CameraBarState extends State<CameraBar> {
                       defaultValue: listenables.imageHeight.toDouble(),
                       onChanged: (px) {
                         listenables.imageHeight = px.toInt();
-                        _presets[_presets.indexOf(_selectedPreset)]
+                        _presets[_presets
+                                .indexOf(listenables.selectedCameraPreset!)]
                             .imageHeight = px.toInt();
                       },
-                      enabled: !_selectedPreset.defaultPreset,
+                      enabled: !listenables.selectedCameraPreset!.defaultPreset,
                     ),
                   ],
                 ),

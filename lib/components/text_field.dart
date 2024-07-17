@@ -15,7 +15,7 @@ class CustomTextField extends StatelessWidget {
   final String labelText;
   final double min;
   final double max;
-  final double defaultValue;
+  final num defaultValue;
   final bool? decimal;
   final bool enabled;
   final void Function(double) onChanged;
@@ -32,7 +32,7 @@ class CustomTextField extends StatelessWidget {
           min: min,
           max: max,
           onChanged: onChanged,
-          value: defaultValue,
+          value: defaultValue.toDouble(),
           decoration: InputDecoration(
             labelText: labelText,
             border: const OutlineInputBorder(),

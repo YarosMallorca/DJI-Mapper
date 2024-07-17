@@ -26,6 +26,7 @@ class _AircraftBarState extends State<AircraftBar> {
       listenables.sideOverlap = settings.sideOverlap;
       listenables.rotation = settings.rotation;
       listenables.delayAtWaypoint = settings.delay;
+      listenables.cameraAngle = settings.cameraAngle;
       listenables.onFinished = settings.finishAction;
       listenables.rcLostAction = settings.rcLostAction;
     });
@@ -41,6 +42,7 @@ class _AircraftBarState extends State<AircraftBar> {
       sideOverlap: listenables.sideOverlap,
       rotation: listenables.rotation,
       delay: listenables.delayAtWaypoint,
+      cameraAngle: listenables.cameraAngle,
       finishAction: listenables.onFinished,
       rcLostAction: listenables.rcLostAction,
     ));
@@ -67,7 +69,7 @@ class _AircraftBarState extends State<AircraftBar> {
                           listenables.altitude = m.round();
                           _updateSettings(listenables);
                         },
-                        defaultValue: listenables.altitude.toDouble()),
+                        defaultValue: listenables.altitude),
                     CustomTextField(
                         labelText: "Speed (m/s)",
                         min: 0.1,
@@ -93,7 +95,7 @@ class _AircraftBarState extends State<AircraftBar> {
                       labelText: "Overlap (%)",
                       min: 1,
                       max: 90,
-                      defaultValue: listenables.forwardOverlap.toDouble(),
+                      defaultValue: listenables.forwardOverlap,
                       onChanged: (percent) {
                         listenables.forwardOverlap = percent.round();
                         _updateSettings(listenables);
@@ -103,7 +105,7 @@ class _AircraftBarState extends State<AircraftBar> {
                       labelText: "Sidelap (%)",
                       min: 1,
                       max: 90,
-                      defaultValue: listenables.sideOverlap.toDouble(),
+                      defaultValue: listenables.sideOverlap,
                       onChanged: (percent) {
                         listenables.sideOverlap = percent.round();
                         _updateSettings(listenables);
@@ -113,9 +115,19 @@ class _AircraftBarState extends State<AircraftBar> {
                       labelText: "Rotation (deg)",
                       min: 0,
                       max: 360,
-                      defaultValue: listenables.rotation.toDouble(),
+                      defaultValue: listenables.rotation,
                       onChanged: (degrees) {
                         listenables.rotation = degrees.round();
+                        _updateSettings(listenables);
+                      },
+                    ),
+                    CustomTextField(
+                      labelText: "Camera angle (deg)",
+                      min: -90,
+                      max: 0,
+                      defaultValue: listenables.cameraAngle,
+                      onChanged: (degrees) {
+                        listenables.cameraAngle = degrees.round();
                         _updateSettings(listenables);
                       },
                     ),
@@ -128,7 +140,7 @@ class _AircraftBarState extends State<AircraftBar> {
                 labelText: "Delay at Waypoint (sec)",
                 min: 0,
                 max: 10,
-                defaultValue: listenables.delayAtWaypoint.toDouble(),
+                defaultValue: listenables.delayAtWaypoint,
                 onChanged: (delaySeconds) {
                   listenables.delayAtWaypoint = delaySeconds.round();
                   _updateSettings(listenables);

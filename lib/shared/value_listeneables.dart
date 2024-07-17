@@ -1,3 +1,4 @@
+import 'package:dji_mapper/presets/camera_preset.dart';
 import 'package:dji_waypoint_engine/engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -40,6 +41,13 @@ class ValueListenables extends ChangeNotifier {
   double get speed => _speed.value;
   set speed(double value) {
     _speed.value = value;
+    notifyListeners();
+  }
+
+  final _cameraAngle = ValueNotifier<int>(-90);
+  int get cameraAngle => _cameraAngle.value;
+  set cameraAngle(int value) {
+    _cameraAngle.value = value;
     notifyListeners();
   }
 
@@ -137,6 +145,12 @@ class ValueListenables extends ChangeNotifier {
   set flightLine(Polyline? value) {
     _flightLine.value = value;
     notifyListeners();
+  }
+
+  final _selectedCamearPreset = ValueNotifier<CameraPreset?>(null);
+  CameraPreset? get selectedCameraPreset => _selectedCamearPreset.value;
+  set selectedCameraPreset(CameraPreset? value) {
+    _selectedCamearPreset.value = value;
   }
 
   void notify() => notifyListeners();

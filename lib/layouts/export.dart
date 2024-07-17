@@ -155,8 +155,9 @@ class ExportBarState extends State<ExportBar> {
                   Action(
                       id: id,
                       actionFunction: ActionFunction.gimbalEvenlyRotate,
-                      actionParams:
-                          GimbalRotateParams(pitch: -90, payloadPosition: 0)),
+                      actionParams: GimbalRotateParams(
+                          pitch: listenables.cameraAngle.toDouble(),
+                          payloadPosition: 0)),
                 if (listenables.delayAtWaypoint > 0)
                   Action(
                       id: id,

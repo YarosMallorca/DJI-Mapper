@@ -7,6 +7,7 @@ import 'package:dji_mapper/layouts/aircraft.dart';
 import 'package:dji_mapper/layouts/camera.dart';
 import 'package:dji_mapper/layouts/export.dart';
 import 'package:dji_mapper/layouts/info.dart';
+import 'package:dji_mapper/presets/preset_manager.dart';
 import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -16,6 +17,8 @@ import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+
+import '../shared/aircraft_settings.dart';
 
 class HomeLayout extends StatefulWidget {
   const HomeLayout({super.key});
@@ -39,6 +42,26 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _getLocationAndMoveMap();
+
+    final presets = PresetManager.getPresets();
+    Provider.of<ValueListenables>(context, listen: false).selectedCameraPreset =
+        presets[0];
+
+    final listenables = Provider.of<ValueListenables>(context, listen: false);
+
+    final settings = AircraftSettings.getAircraftSettings();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      listenables.altitude = settings.altitude;
+      listenables.speed = settings.speed;
+      listenables.forwardOverlap = settings.forwardOverlap;
+      listenables.sideOverlap = settings.sideOverlap;
+      listenables.rotation = settings.rotation;
+      listenables.delayAtWaypoint = settings.delay;
+      listenables.cameraAngle = settings.cameraAngle;
+      listenables.onFinished = settings.finishAction;
+      listenables.rcLostAction = settings.rcLostAction;
+    });
   }
 
   Future<void> _search(String query) async {
