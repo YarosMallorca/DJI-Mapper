@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       child: DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
         return Consumer<ThemeManager>(builder: (context, theme, child) {
           return MaterialApp(
-            title: 'DJI Waypoint Mapping',
+            title: 'DJI Mapper',
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               colorScheme: lightColorScheme ??

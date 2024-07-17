@@ -31,6 +31,7 @@ dependencies:
   url_launcher: ^6.3.0
   geolocator: ^11.0.0
   dio: ^5.5.0+1
+  package_info_plus: ^8.0.0
 
 dependency_overrides:
   geolocator_android: 4.5.4
@@ -43,3 +44,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/logo.png
