@@ -10,7 +10,9 @@ class MappingAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Consumer<ThemeManager>(
       builder: (context, theme, child) => AppBar(
-        title: const Text("DJI Mapper"),
+        title: GestureDetector(
+            onTap: () => showAboutDialog(context: context),
+            child: const Text("DJI Mapper")),
         elevation: 10,
         actions: [
           PopupMenuButton(
