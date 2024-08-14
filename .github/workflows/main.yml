@@ -1,0 +1,38 @@
+name: Flutter
+
+on:
+  push:
+    branches: ["master"]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0"
+          channel: "stable"
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Get dependencies for dji_waypoint_engine
+        working-directory: ./packages/dji_waypoint_engine
+        run: dart pub get
+
+      - name: Get dependencies for litchi_waypoint_engine
+        working-directory: ./packages/litchi_waypoint_engine
+        run: dart pub get
+
+      - name: Analyze project source
+        run: flutter analyze
+
+      - name: Test dji_waypoint_engine
+        working-directory: ./packages/dji_waypoint_engine
+        run: dart test
+
+      - name: test litchi_waypoint_engine
+        working-directory: ./packages/litchi_waypoint_engine
+        run: dart test

@@ -18,7 +18,7 @@ void main() {
         gimbalMode: GimbalMode.interpolate,
         gimbalPitch: -30,
         altitudeMode: AltitudeMode.msl,
-        poi: Poi(latitude: 37.7749, longitude: -122.4194, altitude: 50),
+        poi: const Poi(latitude: 37.7749, longitude: -122.4194, altitude: 50),
         actions: [
           Action(actionType: ActionType.takePhoto),
           Action(actionType: ActionType.startRecording),

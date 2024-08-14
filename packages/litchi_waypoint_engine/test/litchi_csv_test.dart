@@ -19,7 +19,8 @@ void main() {
             ],
             altitudeMode: AltitudeMode.agl,
             speed: 5,
-            poi: Poi(latitude: 37.7749, longitude: -122.4194, altitude: 50),
+            poi: const Poi(
+                latitude: 37.7749, longitude: -122.4194, altitude: 50),
             photoTimeInterval: 10),
         Waypoint(
           latitude: 37.7749,
