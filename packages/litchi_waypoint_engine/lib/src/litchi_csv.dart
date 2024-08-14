@@ -65,7 +65,7 @@ class LitchiCsv {
             return ["-1", "0"];
           }
         }).expand((x) => x),
-        waypoint.altitudeMode.toString().split('.').last,
+        waypoint.altitudeMode == AltitudeMode.agl ? "0" : "1",
         waypoint.speed.toString(),
         waypoint.poi?.latitude.toString() ?? "0",
         waypoint.poi?.longitude.toString() ?? "0",

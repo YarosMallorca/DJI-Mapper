@@ -42,7 +42,7 @@ class Waypoint {
   /// Actions for the waypoint
   final List<Action>? actions;
 
-  /// Time interval for photos
+  /// Time interval for photos in milliseconds
   ///
   /// If not specified, it will be disabled
   final double? photoTimeInterval;
