@@ -1,0 +1,9 @@
+name: litchi_waypoint_engine
+description: A package to generate Litchi Waypoint Missions compatible with the Litchi Hub and app
+version: 0.0.1
+
+environment:
+  sdk: "^3.0.0"
+
+dependencies:
+  csv: ^6.0.0

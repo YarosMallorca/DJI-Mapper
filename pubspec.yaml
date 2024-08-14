@@ -20,6 +20,8 @@ dependencies:
   xml: ^6.5.0
   dji_waypoint_engine:
     path: ./packages/dji_waypoint_engine
+  litchi_waypoint_engine:
+    path: ./packages/litchi_waypoint_engine
   flutter_map_dragmarker: ^6.0.0
   shared_preferences: ^2.2.3
   flutter_map_cancellable_tile_provider: ^2.0.0

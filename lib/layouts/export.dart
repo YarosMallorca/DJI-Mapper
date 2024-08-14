@@ -1,3 +1,4 @@
+import 'package:litchi_waypoint_engine/engine.dart' as litchi;
 import 'package:universal_io/io.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:archive/archive.dart';
@@ -55,7 +56,7 @@ class ExportBarState extends State<ExportBar> {
             /// Not sure why duplication is necessary
             missionConfig: missionConfig));
 
-    var placemarks = _generatePlacemarks(listenables);
+    var placemarks = _generateDjiPlacemarks(listenables);
 
     var waylines = WaylinesWpml(
         document: WpmlDocumentElement(
@@ -86,7 +87,7 @@ class ExportBarState extends State<ExportBar> {
     if (!kIsWeb) {
       outputPath = await FilePicker.platform.saveFile(
           type: FileType.custom,
-          fileName: "output",
+          fileName: "output.kmz",
           allowedExtensions: ["kmz"],
           dialogTitle: "Save Mission");
 
@@ -100,8 +101,6 @@ class ExportBarState extends State<ExportBar> {
     } else {
       outputPath = "output.kmz";
     }
-
-    // Add code here
 
     if (!kIsWeb) {
       if (!outputPath.endsWith(".kmz")) {
@@ -126,7 +125,79 @@ class ExportBarState extends State<ExportBar> {
     }
   }
 
-  List<Placemark> _generatePlacemarks(ValueListenables listenables) {
+  Future<void> _exportForLithi(ValueListenables listenables) async {
+    String csvContent =
+        litchi.LitchiCsv.generateCsv(_generateLitchiWaypoints(listenables));
+
+    String? outputPath;
+
+    if (!kIsWeb) {
+      outputPath = await FilePicker.platform.saveFile(
+          type: FileType.custom,
+          fileName: "litchi_mission.csv",
+          allowedExtensions: ["csv"],
+          dialogTitle: "Save Mission");
+
+      if (outputPath == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Mission export cancelled")));
+        }
+        return;
+      }
+    } else {
+      outputPath = "output.csv";
+    }
+
+    if (!kIsWeb) {
+      if (!outputPath.endsWith(".csv")) {
+        outputPath += ".csv";
+      }
+      // Save file for non-web platforms
+      final file = File(outputPath);
+      await file.writeAsString(csvContent);
+    } else {
+      // Save file for web platform
+      final blob = html.Blob([csvContent], 'text/csv');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      html.AnchorElement(href: url)
+        ..setAttribute("download", "litchi_mission.csv")
+        ..click();
+      html.Url.revokeObjectUrl(url);
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Mission exported successfully")));
+    }
+  }
+
+  List<litchi.Waypoint> _generateLitchiWaypoints(ValueListenables listenables) {
+    var waypoints = <litchi.Waypoint>[];
+
+    for (var photoLocation in listenables.photoLocations) {
+      waypoints.add(litchi.Waypoint(
+          latitude: photoLocation.latitude,
+          longitude: photoLocation.longitude,
+          altitude: listenables.altitude,
+          speed: listenables.speed.toInt(),
+          gimbalPitch: listenables.cameraAngle,
+          gimbalMode: litchi.GimbalMode.interpolate,
+          actions: [
+            if (listenables.delayAtWaypoint > 0)
+              litchi.Action(
+                  actionType: litchi.ActionType.stayFor,
+
+                  // Litchi uses milliseconds for delay time
+                  actionParam: listenables.delayAtWaypoint.toDouble() * 1000),
+            litchi.Action(actionType: litchi.ActionType.takePhoto)
+          ]));
+    }
+
+    return waypoints;
+  }
+
+  List<Placemark> _generateDjiPlacemarks(ValueListenables listenables) {
     var placemarks = <Placemark>[];
 
     for (var photoLocation in listenables.photoLocations) {
@@ -193,11 +264,11 @@ class ExportBarState extends State<ExportBar> {
                   onPressed: () => _exportForDJIFly(listenables),
                   child: const Text("Save as DJI Fly Waypoint Mission")),
             ),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                  onPressed: null,
-                  child: Text("Save as Litchi Mission (coming soon)")),
+                  onPressed: () => _exportForLithi(listenables),
+                  child: const Text("Save as Litchi Mission")),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
