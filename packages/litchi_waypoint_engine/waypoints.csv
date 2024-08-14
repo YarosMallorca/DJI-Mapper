@@ -1,0 +1,5 @@
+latitude,longitude,altitude(m),heading(deg),curvesize(m),rotationdir,gimbalmode,gimbalpitchangle,altitudemode,speed(m/s),poi_latitude,poi_longitude,poi_altitude(m),poi_altitudemode,photo_timeinterval,photo_distinterval
+39.582095944969154,3.377013508806934,30,0,0.0,0,2,0,0,6,0,0,0,1,-1,-1
+39.58324787135231,3.377717912315177,30,0,0.0,0,2,0,0,6,0,0,0,1,-1,-1
+39.583437196034645,3.37712893627256,30,0,0.0,0,2,0,0,6,0,0,0,1,-1,-1
+39.582319488614814,3.3765251618876313,30,0,0.0,0,2,0,0,6,0,0,0,1,-1,-1

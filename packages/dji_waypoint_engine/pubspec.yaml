@@ -8,3 +8,5 @@ environment:
 dependencies:
   archive: ^3.6.1
   xml: ^6.5.0
+dev_dependencies:
+  test: ^1.25.8
