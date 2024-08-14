@@ -11,6 +11,7 @@ import 'package:dji_mapper/layouts/info.dart';
 import 'package:dji_mapper/main.dart';
 import 'package:dji_mapper/presets/preset_manager.dart';
 import 'package:dji_mapper/shared/value_listeneables.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -66,36 +67,39 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       listenables.rcLostAction = settings.rcLostAction;
     });
 
-    UpdateChecker.checkForUpdate().then((latestVersion) => {
-          if (latestVersion != null && mounted)
-            {
-              showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                        title: const Text('Update available'),
-                        content: Text('Version $latestVersion is available. '
-                            'Do you want to download it?'),
-                        actions: [
-                          TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Later')),
-                          TextButton(
-                              onPressed: () {
-                                prefs.setString("ignoreVersion", latestVersion);
-                                Navigator.pop(context);
-                              },
-                              child: const Text("Ignore this version")),
-                          ElevatedButton(
-                              child: const Text('Download'),
-                              onPressed: () {
-                                launchUrl(Uri.https("github.com",
-                                    "YarosMallorca/DJI-Mapper/releases/latest"));
-                                Navigator.pop(context);
-                              })
-                        ],
-                      ))
-            }
-        });
+    if (!kIsWeb) {
+      UpdateChecker.checkForUpdate().then((latestVersion) => {
+            if (latestVersion != null && mounted)
+              {
+                showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                          title: const Text('Update available'),
+                          content: Text('Version $latestVersion is available. '
+                              'Do you want to download it?'),
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Later')),
+                            TextButton(
+                                onPressed: () {
+                                  prefs.setString(
+                                      "ignoreVersion", latestVersion);
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Ignore this version")),
+                            ElevatedButton(
+                                child: const Text('Download'),
+                                onPressed: () {
+                                  launchUrl(Uri.https("github.com",
+                                      "YarosMallorca/DJI-Mapper/releases/latest"));
+                                  Navigator.pop(context);
+                                })
+                          ],
+                        ))
+              }
+          });
+    }
   }
 
   Future<void> _search(String query) async {
