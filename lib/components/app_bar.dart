@@ -80,7 +80,7 @@ class _MappingAppBarState extends State<MappingAppBar> {
                   const PopupMenuItem(
                     value: "litchi_help",
                     child: ListTile(
-                      title: Text("Litchi Help"),
+                      title: Text("Litchi"),
                     ),
                   ),
                 ],
