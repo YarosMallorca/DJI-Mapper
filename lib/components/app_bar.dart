@@ -71,7 +71,6 @@ class _MappingAppBarState extends State<MappingAppBar> {
                 child: const ListTile(
                   leading: Icon(Icons.help_outline),
                   title: Text("Help loading mission"),
-                  onTap: null,
                 ),
                 itemBuilder: (context) => [
                   const PopupMenuItem(
