@@ -162,8 +162,8 @@ class Placemark extends XmlElement {
 }
 
 class WaypointPoint extends XmlElement {
-  final longitude;
-  final latitude;
+  final double longitude;
+  final double latitude;
 
   WaypointPoint({required this.longitude, required this.latitude})
       : super(

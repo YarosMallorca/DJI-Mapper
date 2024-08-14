@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:dji_mapper/components/app_bar.dart';
 import 'package:dji_mapper/core/drone_mapping_engine.dart';
+import 'package:dji_mapper/github/update_checker.dart';
 import 'package:dji_mapper/layouts/aircraft.dart';
 import 'package:dji_mapper/layouts/camera.dart';
 import 'package:dji_mapper/layouts/export.dart';
 import 'package:dji_mapper/layouts/info.dart';
+import 'package:dji_mapper/main.dart';
 import 'package:dji_mapper/presets/preset_manager.dart';
 import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,7 @@ import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../shared/aircraft_settings.dart';
 
@@ -62,6 +65,37 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       listenables.onFinished = settings.finishAction;
       listenables.rcLostAction = settings.rcLostAction;
     });
+
+    UpdateChecker.checkForUpdate().then((latestVersion) => {
+          if (latestVersion != null && mounted)
+            {
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                        title: const Text('Update available'),
+                        content: Text('Version $latestVersion is available. '
+                            'Do you want to download it?'),
+                        actions: [
+                          TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Later')),
+                          TextButton(
+                              onPressed: () {
+                                prefs.setString("ignoreVersion", latestVersion);
+                                Navigator.pop(context);
+                              },
+                              child: const Text("Ignore this version")),
+                          ElevatedButton(
+                              child: const Text('Download'),
+                              onPressed: () {
+                                launchUrl(Uri.https("github.com",
+                                    "YarosMallorca/DJI-Mapper/releases/latest"));
+                                Navigator.pop(context);
+                              })
+                        ],
+                      ))
+            }
+        });
   }
 
   Future<void> _search(String query) async {
@@ -104,7 +138,8 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       await Geolocator.requestPermission();
     }
     final location = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.low);
+        locationSettings:
+            const LocationSettings(accuracy: LocationAccuracy.low));
     mapController.move(LatLng(location.latitude, location.longitude), 14);
   }
 
