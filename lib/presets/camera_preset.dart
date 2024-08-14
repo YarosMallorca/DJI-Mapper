@@ -1,7 +1,6 @@
 class CameraPreset {
   String name;
   bool defaultPreset;
-
   double sensorWidth;
   double sensorHeight;
   double focalLength;

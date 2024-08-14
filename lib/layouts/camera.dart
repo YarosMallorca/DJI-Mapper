@@ -1,4 +1,5 @@
 import 'package:dji_mapper/components/text_field.dart';
+import 'package:dji_mapper/main.dart';
 import 'package:dji_mapper/presets/camera_preset.dart';
 import 'package:dji_mapper/presets/preset_manager.dart';
 import 'package:dji_mapper/shared/value_listeneables.dart';
@@ -19,6 +20,16 @@ class _CameraBarState extends State<CameraBar> {
   void initState() {
     super.initState();
     _presets = PresetManager.getPresets();
+
+    // Load the latest preset
+    var latestPresetName = prefs.getString("latestPreset");
+    if (latestPresetName == null) {
+      latestPresetName = _presets[0].name;
+      prefs.setString("latestPreset", latestPresetName);
+    }
+    Provider.of<ValueListenables>(context, listen: false).selectedCameraPreset =
+        _presets.firstWhere((element) => element.name == latestPresetName,
+            orElse: () => _presets[0]);
   }
 
   void _updatePreset(ValueListenables listenables) {
@@ -50,6 +61,8 @@ class _CameraBarState extends State<CameraBar> {
     Provider.of<ValueListenables>(context, listen: false).selectedCameraPreset =
         newPreset;
     listenables.notify();
+    // Update latest preset
+    prefs.setString("latestPreset", listenables.selectedCameraPreset!.name);
     Navigator.pop(context);
   }
 
@@ -87,6 +100,10 @@ class _CameraBarState extends State<CameraBar> {
                           listenables.selectedCameraPreset!.imageWidth;
                       listenables.imageHeight =
                           listenables.selectedCameraPreset!.imageHeight;
+
+                      // Update latest preset
+                      prefs.setString("latestPreset",
+                          listenables.selectedCameraPreset!.name);
                     }),
                 const SizedBox(
                   width: 6,
@@ -134,6 +151,10 @@ class _CameraBarState extends State<CameraBar> {
                           _presets = PresetManager.getPresets();
                           listenables.selectedCameraPreset =
                               _presets[previousIndex - 1];
+                          prefs.setString(
+                            "latestPreset",
+                            listenables.selectedCameraPreset!.name,
+                          );
                           listenables.notify();
                         },
                   icon: const Icon(Icons.delete),
