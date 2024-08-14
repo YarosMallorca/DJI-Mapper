@@ -49,3 +49,4 @@ flutter:
 
   assets:
     - assets/logo.png
+    - assets/litchi_alert/

@@ -1,3 +1,6 @@
+import 'package:dji_mapper/components/popups/dji_load_alert.dart';
+import 'package:dji_mapper/components/popups/litchi_load_alert.dart';
+import 'package:dji_mapper/main.dart';
 import 'package:litchi_waypoint_engine/engine.dart' as litchi;
 import 'package:universal_io/io.dart';
 import 'package:universal_html/html.dart' as html;
@@ -57,6 +60,12 @@ class ExportBarState extends State<ExportBar> {
             missionConfig: missionConfig));
 
     var placemarks = _generateDjiPlacemarks(listenables);
+
+    if (placemarks.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("No waypoints to export. Please add waypoints first")));
+      return;
+    }
 
     var waylines = WaylinesWpml(
         document: WpmlDocumentElement(
@@ -122,12 +131,24 @@ class ExportBarState extends State<ExportBar> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Mission exported successfully")));
+
+      if (!(prefs.getBool("djiWarningDoNotShow") ?? false)) {
+        showDialog(
+            context: context, builder: (context) => const DjiLoadAlert());
+      }
     }
   }
 
   Future<void> _exportForLithi(ValueListenables listenables) async {
-    String csvContent =
-        litchi.LitchiCsv.generateCsv(_generateLitchiWaypoints(listenables));
+    final waypoints = _generateLitchiWaypoints(listenables);
+
+    if (waypoints.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("No waypoints to export. Please add waypoints first")));
+      return;
+    }
+
+    String csvContent = litchi.LitchiCsv.generateCsv(waypoints);
 
     String? outputPath;
 
@@ -169,6 +190,10 @@ class ExportBarState extends State<ExportBar> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Mission exported successfully")));
+      if (!(prefs.getBool("litchiWarningDoNotShow") ?? false)) {
+        showDialog(
+            context: context, builder: (context) => const LitchiLoadAlert());
+      }
     }
   }
 

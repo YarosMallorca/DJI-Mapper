@@ -1,8 +1,11 @@
+import 'package:dji_mapper/components/popups/dji_load_alert.dart';
 import 'package:dji_mapper/shared/theme_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'popups/litchi_load_alert.dart';
 
 class MappingAppBar extends StatefulWidget implements PreferredSizeWidget {
   const MappingAppBar({super.key});
@@ -62,11 +65,41 @@ class _MappingAppBarState extends State<MappingAppBar> {
                   title: Text("GitHub"),
                 ),
               ),
-              const PopupMenuItem(
-                  value: "help",
-                  child: ListTile(
-                      leading: Icon(Icons.help_outline),
-                      title: Text("Help loading mission"))),
+              PopupMenuItem(
+                  child: PopupMenuButton(
+                offset: const Offset(-210, 0),
+                child: const ListTile(
+                  leading: Icon(Icons.help_outline),
+                  title: Text("Help loading mission"),
+                  onTap: null,
+                ),
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: "dji_help",
+                    child: Text("DJI"),
+                  ),
+                  const PopupMenuItem(
+                    value: "litchi_help",
+                    child: ListTile(
+                      title: Text("Litchi Help"),
+                    ),
+                  ),
+                ],
+                onSelected: (value) {
+                  switch (value) {
+                    case "dji_help":
+                      showDialog(
+                          context: context,
+                          builder: (context) =>
+                              const DjiLoadAlert(showCheckbox: false));
+                    case "litchi_help":
+                      showDialog(
+                          context: context,
+                          builder: (context) =>
+                              const LitchiLoadAlert(showCheckbox: false));
+                  }
+                },
+              )),
             ],
             onSelected: (value) {
               switch (value) {
