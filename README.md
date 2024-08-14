@@ -10,11 +10,11 @@ A cross-platform tool to plan and create automatic Survey/Photogrammetry mission
 
 ## Features
 
-- **Cross-platform**: Works on Windows, Linux and MacOS.
+- **Cross-platform**: Works on Windows, Linux, MacOS & Android.
 - **Easy to use**: Just a few clicks to create a mission.
 - **Customizable**: Change the mission parameters to fit your needs.
-- **Works with DJI Drones**: Compatible with DJI Drones that support Waypoints.
-- **Works with Litchi**: Export missions to Litchi for DJI Drones that don't support Waypoints. (coming soon)
+- **Works with DJI Fly**: Compatible with DJI Drones that support Waypoints.
+- **Works with Litchi**: Export missions to Litchi for DJI Drones that don't support Waypoints.
 
 ## Installation
 
@@ -32,7 +32,7 @@ A cross-platform tool to plan and create automatic Survey/Photogrammetry mission
 4. Select the camera you're using from the presets, or create a custom one.
 5. On the Info tab, you can see general info about the mission.
 6. On the Export tab, click the button to export the mission to a file.
-7. Load the mission on your drone and start the mission. ([detailed details here](https://mavicpilots.com/threads/waypoints-how-to-back-up-export-import.135283/))
+7. Load the mission on your drone and start the mission. (detailed instructions can be found by clicking three dots on the top and going to "Help loading mission" page)
 
 _Note: Do not modify or save the mission from inside DJI Fly, because it doesn't support straight curves, and will break the mission._
 
