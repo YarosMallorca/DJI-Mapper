@@ -24,6 +24,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../shared/aircraft_settings.dart';
 
+enum MapLayer { streets, satellite }
+
 class HomeLayout extends StatefulWidget {
   const HomeLayout({super.key});
 
@@ -34,6 +36,8 @@ class HomeLayout extends StatefulWidget {
 class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
   final MapController mapController = MapController();
   late final TabController _tabController;
+
+  late MapLayer _selectedMapLayer;
 
   final List<Marker> _photoMarkers = [];
 
@@ -46,6 +50,9 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _getLocationAndMoveMap();
+
+    _selectedMapLayer =
+        prefs.getInt("mapLayer") == 1 ? MapLayer.satellite : MapLayer.streets;
 
     final presets = PresetManager.getPresets();
     Provider.of<ValueListenables>(context, listen: false).selectedCameraPreset =
@@ -213,14 +220,16 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
               ),
               children: [
                 TileLayer(
-                  tileProvider: CancellableNetworkTileProvider(),
-                  tileBuilder: Theme.of(context).brightness == Brightness.dark
-                      ? (context, tileWidget, tile) =>
-                          darkModeTileBuilder(context, tileWidget, tile)
-                      : null,
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.yarosfpv.dji_mapper',
-                ),
+                    tileProvider: CancellableNetworkTileProvider(),
+                    tileBuilder: Theme.of(context).brightness == Brightness.dark
+                        ? (context, tileWidget, tile) =>
+                            darkModeTileBuilder(context, tileWidget, tile)
+                        : null,
+                    urlTemplate: _selectedMapLayer == MapLayer.streets
+                        ? 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
+                        : 'https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+                    userAgentPackageName: 'com.yarosfpv.dji_mapper',
+                    subdomains: const ['mt0', 'mt1', 'mt2', 'mt3']),
                 PolygonLayer(polygons: [
                   Polygon(
                       points: listenables.polygon,
@@ -361,9 +370,37 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
-                  child: Row(
+                  child: Column(
                     mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      Material(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(10),
+                        child: InkWell(
+                            borderRadius: BorderRadius.circular(10),
+                            onTap: () => setState(() {
+                                  _selectedMapLayer =
+                                      _selectedMapLayer == MapLayer.streets
+                                          ? MapLayer.satellite
+                                          : MapLayer.streets;
+                                  prefs.setInt(
+                                      "mapLayer",
+                                      _selectedMapLayer == MapLayer.streets
+                                          ? 0
+                                          : 1);
+                                }),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Icon(
+                                Icons.layers,
+                                size: 20,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                              ),
+                            )),
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Material(
