@@ -18,6 +18,14 @@ A cross-platform tool to plan and create automatic Survey/Photogrammetry mission
 - **Works with DJI Fly**: Compatible with DJI Drones that support Waypoints.
 - **Works with Litchi**: Export missions to Litchi for DJI Drones that don't support Waypoints.
 
+## Supported Aircraft
+
+- **DJI Fly**: DJI Mini 4 Pro, DJI Air 3, DJI Mavic 3, Mavic 3 Cine, Mavic 3 Classic
+- **Litchi**: Mini 2, Mini SE (NOT Mini 4K), Air 2S, Mavic Mini 1, Mavic Air 2, Mavic 2 Zoom/Pro, Mavic Air 1, Mavic Pro 1, Phantom 4 (Standard/Advanced/Pro/ProV2), Phantom 3 (Standard/4K/Advanced/Professional), Inspire 1 (X3/Z3/Pro/RAW), Inspire 2 and Spark
+- **Litchi Pilot Beta**: Mini 3, Mini 3 Pro, Mavic 3E, Mavic 3T
+  
+**IMPORTANT NOTE regarding Litchi Pilot**: I haven't tested how well Litchi Pilot plays with DJI-Mapper, so I can't guarantee a smooth experience. 
+
 ## Installation
 
 1. Download the latest version from the [Releases](https://github.com/YarosMallorca/DJI-Mapper/releases/latest) page.
