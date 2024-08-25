@@ -21,15 +21,24 @@ class _CameraBarState extends State<CameraBar> {
     super.initState();
     _presets = PresetManager.getPresets();
 
+    final listenables = Provider.of<ValueListenables>(context, listen: false);
+
     // Load the latest preset
     var latestPresetName = prefs.getString("latestPreset");
     if (latestPresetName == null) {
       latestPresetName = _presets[0].name;
       prefs.setString("latestPreset", latestPresetName);
     }
-    Provider.of<ValueListenables>(context, listen: false).selectedCameraPreset =
-        _presets.firstWhere((element) => element.name == latestPresetName,
-            orElse: () => _presets[0]);
+
+    // Select the latest preset
+    listenables.selectedCameraPreset = _presets.firstWhere(
+        (element) => element.name == latestPresetName,
+        orElse: () => _presets[0]);
+
+    // Update listenables
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateProvider(listenables);
+    });
   }
 
   void _updatePreset(ValueListenables listenables) {
@@ -66,6 +75,14 @@ class _CameraBarState extends State<CameraBar> {
     Navigator.pop(context);
   }
 
+  void _updateProvider(ValueListenables listenables) {
+    listenables.sensorWidth = listenables.selectedCameraPreset!.sensorWidth;
+    listenables.sensorHeight = listenables.selectedCameraPreset!.sensorHeight;
+    listenables.focalLength = listenables.selectedCameraPreset!.focalLength;
+    listenables.imageWidth = listenables.selectedCameraPreset!.imageWidth;
+    listenables.imageHeight = listenables.selectedCameraPreset!.imageHeight;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ValueListenables>(builder: (context, listenables, child) {
@@ -90,16 +107,7 @@ class _CameraBarState extends State<CameraBar> {
                       listenables.selectedCameraPreset = item ?? _presets[0];
 
                       // Update listenables
-                      listenables.sensorWidth =
-                          listenables.selectedCameraPreset!.sensorWidth;
-                      listenables.sensorHeight =
-                          listenables.selectedCameraPreset!.sensorHeight;
-                      listenables.focalLength =
-                          listenables.selectedCameraPreset!.focalLength;
-                      listenables.imageWidth =
-                          listenables.selectedCameraPreset!.imageWidth;
-                      listenables.imageHeight =
-                          listenables.selectedCameraPreset!.imageHeight;
+                      _updateProvider(listenables);
 
                       // Update latest preset
                       prefs.setString("latestPreset",
@@ -224,13 +232,7 @@ class _CameraBarState extends State<CameraBar> {
                       max: 10000,
                       onChanged: (px) {
                         listenables.imageWidth = px.toInt();
-                        _presets[_presets
-                                .indexOf(listenables.selectedCameraPreset!)]
-                            .imageWidth = px.toInt();
-                        PresetManager.updatePreset(
-                            _presets.indexOf(listenables.selectedCameraPreset!),
-                            _presets[_presets
-                                .indexOf(listenables.selectedCameraPreset!)]);
+                        _updatePreset(listenables);
                       },
                       defaultValue: listenables.imageWidth.toDouble(),
                       enabled: !listenables.selectedCameraPreset!.defaultPreset,
@@ -242,9 +244,7 @@ class _CameraBarState extends State<CameraBar> {
                       defaultValue: listenables.imageHeight.toDouble(),
                       onChanged: (px) {
                         listenables.imageHeight = px.toInt();
-                        _presets[_presets
-                                .indexOf(listenables.selectedCameraPreset!)]
-                            .imageHeight = px.toInt();
+                        _updatePreset(listenables);
                       },
                       enabled: !listenables.selectedCameraPreset!.defaultPreset,
                     ),
