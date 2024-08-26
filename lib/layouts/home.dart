@@ -208,7 +208,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
 
         var children = [
           Flexible(
-            flex: MediaQuery.of(context).size.width < 700 ? 1 : 2,
+            flex: 2,
             child: FlutterMap(
               mapController: mapController,
               options: MapOptions(

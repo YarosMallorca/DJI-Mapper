@@ -23,7 +23,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.dji_mapper"
+    namespace "com.yarosfpv.dji_mapper"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 

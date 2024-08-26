@@ -1,8 +1,8 @@
+import 'package:universal_io/io.dart';
 import 'package:dji_mapper/components/popups/dji_load_alert.dart';
 import 'package:dji_mapper/components/popups/litchi_load_alert.dart';
 import 'package:dji_mapper/main.dart';
 import 'package:litchi_waypoint_engine/engine.dart' as litchi;
-import 'package:universal_io/io.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:archive/archive.dart';
 import 'package:dji_waypoint_engine/engine.dart';
@@ -98,6 +98,7 @@ class ExportBarState extends State<ExportBar> {
           type: FileType.custom,
           fileName: "output.kmz",
           allowedExtensions: ["kmz"],
+          bytes: zipBytes,
           dialogTitle: "Save Mission");
 
       if (outputPath == null) {
@@ -107,19 +108,19 @@ class ExportBarState extends State<ExportBar> {
         }
         return;
       }
-    } else {
-      outputPath = "output.kmz";
-    }
 
-    if (!kIsWeb) {
-      if (!outputPath.endsWith(".kmz")) {
-        outputPath += ".kmz";
+      // File Saver does not save the file on Desktop platforms
+      if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+        if (!outputPath.endsWith(".kmz")) {
+          outputPath += ".kmz";
+        }
+        // Save file for non-web platforms
+        final file = File(outputPath);
+        await file.writeAsBytes(zipBytes);
       }
-      // Save file for non-web platforms
-      final file = File(outputPath);
-      await file.writeAsBytes(zipBytes);
     } else {
       // Save file for web platform
+      outputPath = "output.kmz";
       final blob = html.Blob([zipBytes], 'application/octet-stream');
       final url = html.Url.createObjectUrlFromBlob(blob);
       html.AnchorElement(href: url)
@@ -157,6 +158,7 @@ class ExportBarState extends State<ExportBar> {
           type: FileType.custom,
           fileName: "litchi_mission.csv",
           allowedExtensions: ["csv"],
+          bytes: Uint8List.fromList(csvContent.codeUnits),
           dialogTitle: "Save Mission");
 
       if (outputPath == null) {
@@ -166,19 +168,19 @@ class ExportBarState extends State<ExportBar> {
         }
         return;
       }
-    } else {
-      outputPath = "output.csv";
-    }
 
-    if (!kIsWeb) {
-      if (!outputPath.endsWith(".csv")) {
-        outputPath += ".csv";
+      // File Saver does not save the file on Desktop platforms
+      if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+        if (!outputPath.endsWith(".csv")) {
+          outputPath += ".csv";
+        }
+        // Save file for non-web platforms
+        final file = File(outputPath);
+        await file.writeAsString(csvContent);
       }
-      // Save file for non-web platforms
-      final file = File(outputPath);
-      await file.writeAsString(csvContent);
     } else {
       // Save file for web platform
+      outputPath = "output.csv";
       final blob = html.Blob([csvContent], 'text/csv');
       final url = html.Url.createObjectUrlFromBlob(blob);
       html.AnchorElement(href: url)

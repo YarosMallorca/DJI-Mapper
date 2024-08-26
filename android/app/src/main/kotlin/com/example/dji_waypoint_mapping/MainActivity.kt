@@ -1,4 +1,4 @@
-package com.example.dji_mapper
+package com.yarosfpv.dji_mapper
 
 import io.flutter.embedding.android.FlutterActivity
 
