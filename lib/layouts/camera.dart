@@ -104,6 +104,7 @@ class _CameraBarState extends State<CameraBar> {
                               child: Text(_presets[i].name),
                             )),
                     onChanged: (item) {
+                      _presets = PresetManager.getPresets();
                       listenables.selectedCameraPreset = item ?? _presets[0];
 
                       // Update listenables
@@ -188,7 +189,7 @@ class _CameraBarState extends State<CameraBar> {
                         _updatePreset(listenables);
                       },
                       defaultValue: listenables.sensorWidth,
-                      decimal: true,
+                      decimals: 1,
                       enabled: !listenables.selectedCameraPreset!.defaultPreset,
                     ),
                     CustomTextField(
@@ -200,7 +201,7 @@ class _CameraBarState extends State<CameraBar> {
                         listenables.sensorHeight = mm;
                         _updatePreset(listenables);
                       },
-                      decimal: true,
+                      decimals: 1,
                       enabled: !listenables.selectedCameraPreset!.defaultPreset,
                     ),
                     CustomTextField(
@@ -212,7 +213,7 @@ class _CameraBarState extends State<CameraBar> {
                         listenables.focalLength = mm;
                         _updatePreset(listenables);
                       },
-                      decimal: true,
+                      decimals: 2,
                       enabled: !listenables.selectedCameraPreset!.defaultPreset,
                     ),
                   ],

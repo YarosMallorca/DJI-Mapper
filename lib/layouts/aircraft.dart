@@ -79,7 +79,7 @@ class _AircraftBarState extends State<AircraftBar> {
                           listenables.speed = speed;
                           _updateSettings(listenables);
                         },
-                        decimal: true),
+                        decimals: 1),
                   ],
                 ),
               ),

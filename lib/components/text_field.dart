@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinbox/material.dart';
+import 'dart:math' as math;
 
 class CustomTextField extends StatelessWidget {
   const CustomTextField(
@@ -10,13 +11,13 @@ class CustomTextField extends StatelessWidget {
       required this.defaultValue,
       required this.onChanged,
       this.enabled = true,
-      this.decimal});
+      this.decimals});
 
   final String labelText;
   final double min;
   final double max;
   final num defaultValue;
-  final bool? decimal;
+  final int? decimals;
   final bool enabled;
   final void Function(double) onChanged;
 
@@ -26,8 +27,8 @@ class CustomTextField extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: SpinBox(
           enabled: enabled,
-          step: decimal != null ? 0.1 : 1,
-          decimals: decimal != null ? 1 : 0,
+          step: decimals != null ? math.pow(10.0, -decimals!).toDouble() : 1,
+          decimals: decimals ?? 0,
           keyboardType: TextInputType.number,
           min: min,
           max: max,
