@@ -180,11 +180,21 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
     for (var photoLocation in waypoints) {
       _photoMarkers.add(Marker(
           point: photoLocation,
+          height: 25,
           alignment: Alignment.center,
           rotate: false,
-          child: Center(
-            child: Icon(Icons.photo_camera,
-                size: 25, color: Theme.of(context).colorScheme.tertiary),
+          child: Container(
+            decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(10)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.photo_camera,
+                    size: 25,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer),
+              ],
+            ),
           )));
     }
     listenables.flightLine = Polyline(
@@ -241,11 +251,11 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                       borderColor: Theme.of(context).colorScheme.primary,
                       borderStrokeWidth: 3),
                 ]),
-                if (listenables.showCameras)
-                  MarkerLayer(markers: _photoMarkers),
                 PolylineLayer(polylines: [
                   listenables.flightLine ?? Polyline(points: [])
                 ]),
+                if (listenables.showCameras)
+                  MarkerLayer(markers: _photoMarkers),
                 DragMarkers(markers: [
                   for (var point in listenables.polygon)
                     DragMarker(
