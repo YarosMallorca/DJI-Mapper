@@ -36,7 +36,47 @@ class PresetManager {
         sensorHeight: 8.8,
         focalLength: 10.3,
         imageWidth: 5472,
-        imageHeight: 3648)
+        imageHeight: 3648),
+    CameraPreset(
+        name: "DJI Mini 3 Pro (12 MP)",
+        defaultPreset: true,
+        sensorWidth: 9.7,
+        sensorHeight: 7.3,
+        focalLength: 6.72,
+        imageWidth: 4032,
+        imageHeight: 3024),
+    CameraPreset(
+        name: "DJI Mini 3 Pro (48 MP)",
+        defaultPreset: true,
+        sensorWidth: 9.7,
+        sensorHeight: 7.3,
+        focalLength: 6.72,
+        imageWidth: 8064,
+        imageHeight: 6048),
+    CameraPreset(
+        name: "DJI Mavic 3E",
+        defaultPreset: true,
+        sensorWidth: 17.3,
+        sensorHeight: 13,
+        focalLength: 12.30,
+        imageWidth: 5280,
+        imageHeight: 3956),
+    CameraPreset(
+        name: "DJI Mavic 3T (RGB)",
+        defaultPreset: true,
+        sensorWidth: 6.4,
+        sensorHeight: 4.8,
+        focalLength: 4.4,
+        imageWidth: 8000,
+        imageHeight: 6000),
+    CameraPreset(
+        name: "DJI Mavic 3T (IR)",
+        defaultPreset: true,
+        sensorWidth: 7.68,
+        sensorHeight: 6.14,
+        focalLength: 9.10,
+        imageWidth: 640,
+        imageHeight: 512)
   ];
 
   /// Sets the default presets
