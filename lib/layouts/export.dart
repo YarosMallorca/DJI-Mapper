@@ -1,3 +1,6 @@
+import 'package:dji_mapper/core/drone_mapper_format.dart';
+import 'package:geoxml/geoxml.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:universal_io/io.dart';
 import 'package:dji_mapper/components/popups/dji_load_alert.dart';
 import 'package:dji_mapper/components/popups/litchi_load_alert.dart';
@@ -274,6 +277,164 @@ class ExportBarState extends State<ExportBar> {
     return placemarks;
   }
 
+  Future<void> _importFromKml(ValueListenables listenables) async {
+    var file = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ["kml"],
+        dialogTitle: "Load Area");
+
+    if (file == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("No file selected. Import cancelled")));
+      }
+      return;
+    }
+
+    late DroneMapperXml kml;
+
+    if (kIsWeb) {
+      kml = await DroneMapperXml.fromKmlString(
+          String.fromCharCodes(file.files.first.bytes!));
+    } else {
+      kml = await DroneMapperXml.fromKmlString(
+          await File(file.files.single.path!).readAsString());
+    }
+
+    if (kml.polygons.isEmpty && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("No polygons found in KML. Import cancelled")));
+      return;
+    } else if (kml.polygons.length > 1) {
+      if (mounted) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              int selectedPolygon = 0;
+              return AlertDialog(
+                title: const Text("Select Polygon"),
+                content: StatefulBuilder(builder: (context, setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                          "Multiple polygons found in the KML file, please select one"),
+                      const Divider(),
+                      ListView.separated(
+                          itemCount: kml.polygons.length,
+                          itemBuilder: (context, index) => CheckboxListTile(
+                                value: selectedPolygon == index,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedPolygon = index;
+                                  });
+                                },
+                                title: Text(kml.polygons[index].name ??
+                                    "Polygon $index"),
+                              ),
+                          separatorBuilder: (context, index) => const Divider(),
+                          shrinkWrap: true)
+                    ],
+                  );
+                }),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("Cancel")),
+                  FilledButton(
+                      onPressed: () => _loadPolygon(kml
+                          .polygons[selectedPolygon].outerBoundaryIs.rtepts
+                          .map((e) => LatLng(e.lat!, e.lon!))
+                          .toList()),
+                      child: const Text("Load"))
+                ],
+              );
+            });
+      }
+      return;
+    } else {
+      _loadPolygon(kml.polygons.first.outerBoundaryIs.rtepts
+          .map((e) => LatLng(e.lat!, e.lon!))
+          .toList());
+      return;
+    }
+  }
+
+  Future<void> _loadPolygon(List<LatLng> polygon) async {
+    Provider.of<ValueListenables>(context, listen: false).polygon = polygon;
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Area imported successfully")));
+    }
+  }
+
+  Future<void> _exportAreaToKml(ValueListenables listenables) async {
+    if (listenables.polygon.length < 3) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("No polygon to export. Please add waypoints first")));
+      return;
+    }
+    var kml = DroneMapperXml();
+    kml.polygons = [
+      Polygon(
+        name: "Mapping Area",
+        outerBoundaryIs: Rte(
+            rtepts: listenables.polygon
+                .map((element) =>
+                    Wpt(lat: element.latitude, lon: element.longitude))
+                .toList()),
+      )
+    ];
+
+    var kmlString = kml.toKmlString(pretty: true);
+
+    String? outputPath;
+
+    if (!kIsWeb) {
+      outputPath = await FilePicker.platform.saveFile(
+          type: FileType.custom,
+          fileName: "area.kml",
+          allowedExtensions: ["kml"],
+          bytes: Uint8List.fromList(kmlString.codeUnits),
+          dialogTitle: "Save Area");
+
+      if (outputPath == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Area export cancelled")));
+        }
+        return;
+      }
+
+      // File Saver does not save the file on Desktop platforms
+      if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+        if (!outputPath.endsWith(".kml")) {
+          outputPath += ".kml";
+        }
+        // Save file for non-web platforms
+        final file = File(outputPath);
+        await file.writeAsBytes(Uint8List.fromList(kmlString.codeUnits));
+      }
+    } else {
+      // Save file for web platform
+      outputPath = "area.kml";
+      final blob = html.Blob([Uint8List.fromList(kmlString.codeUnits)],
+          'application/octet-stream');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      html.AnchorElement(href: url)
+        ..setAttribute("download", "area.kml")
+        ..click();
+      html.Url.revokeObjectUrl(url);
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Area exported successfully")));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -296,6 +457,32 @@ class ExportBarState extends State<ExportBar> {
               child: ElevatedButton(
                   onPressed: () => _exportForLithi(listenables),
                   child: const Text("Save as Litchi Mission")),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("Import/Export Mapping Area",
+                  style: TextStyle(fontSize: 20)),
+            ),
+            Wrap(
+              alignment: WrapAlignment.center,
+              runAlignment: WrapAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Tooltip(
+                    message: "This will override the current mapping area",
+                    child: ElevatedButton(
+                        onPressed: () => _importFromKml(listenables),
+                        child: const Text("Import from KML")),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: ElevatedButton(
+                      onPressed: () => _exportAreaToKml(listenables),
+                      child: const Text("Export to KML")),
+                ),
+              ],
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),

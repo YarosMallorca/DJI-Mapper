@@ -449,7 +449,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                       Tab(icon: Icon(Icons.info_outline), text: 'Info'),
                       Tab(icon: Icon(Icons.airplanemode_on), text: 'Aircraft'),
                       Tab(icon: Icon(Icons.photo_camera), text: 'Camera'),
-                      Tab(icon: Icon(Icons.save_alt), text: 'Export'),
+                      Tab(icon: Icon(Icons.file_copy), text: 'File'),
                     ],
                   ),
                   Expanded(
