@@ -307,51 +307,67 @@ class ExportBarState extends State<ExportBar> {
       return;
     } else if (kml.polygons.length > 1) {
       if (mounted) {
+        int selectedPolygon = 0;
         showDialog(
-            context: context,
-            builder: (context) {
-              int selectedPolygon = 0;
-              return AlertDialog(
-                title: const Text("Select Polygon"),
-                content: StatefulBuilder(builder: (context, setState) {
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text("Select Polygon"),
+              content: StatefulBuilder(
+                builder: (context, setState) {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Text(
                           "Multiple polygons found in the KML file, please select one"),
                       const Divider(),
-                      ListView.separated(
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.5,
+                        width: 400,
+                        child: ListView.separated(
                           itemCount: kml.polygons.length,
                           itemBuilder: (context, index) => CheckboxListTile(
-                                value: selectedPolygon == index,
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedPolygon = index;
-                                  });
-                                },
-                                title: Text(kml.polygons[index].name ??
-                                    "Polygon $index"),
-                              ),
+                            value: selectedPolygon == index,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedPolygon = index;
+                              });
+                            },
+                            title: Text(
+                                kml.polygons[index].name ?? "Polygon $index"),
+                          ),
                           separatorBuilder: (context, index) => const Divider(),
-                          shrinkWrap: true)
+                          shrinkWrap: true,
+                        ),
+                      ),
                     ],
                   );
-                }),
-                actions: [
-                  TextButton(
-                      onPressed: () {
+                },
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("Cancel")),
+                FilledButton(
+                    onPressed: () {
+                      // Ensure a polygon is selected before proceeding
+                      if (selectedPolygon >= 0 &&
+                          selectedPolygon < kml.polygons.length) {
+                        _loadPolygon(
+                          kml.polygons[selectedPolygon].outerBoundaryIs.rtepts
+                              .map((e) => LatLng(e.lat!, e.lon!))
+                              .toList(),
+                        );
                         Navigator.of(context).pop();
-                      },
-                      child: const Text("Cancel")),
-                  FilledButton(
-                      onPressed: () => _loadPolygon(kml
-                          .polygons[selectedPolygon].outerBoundaryIs.rtepts
-                          .map((e) => LatLng(e.lat!, e.lon!))
-                          .toList()),
-                      child: const Text("Load"))
-                ],
-              );
-            });
+                      }
+                    },
+                    child: const Text("Load")),
+              ],
+            );
+          },
+        );
       }
       return;
     } else {
