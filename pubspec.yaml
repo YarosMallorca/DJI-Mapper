@@ -31,7 +31,7 @@ dependencies:
   universal_html: ^2.2.4
   url_launcher: ^6.3.0
   geolocator: ^13.0.1
-  dio: ^5.6.0
+  dio: ^5.7.0
   package_info_plus: ^8.0.2
   geoxml: ^2.6.1
   universal_io: ^2.2.2
