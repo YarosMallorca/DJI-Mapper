@@ -231,10 +231,12 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
               children: [
                 TileLayer(
                     tileProvider: CancellableNetworkTileProvider(),
-                    tileBuilder: Theme.of(context).brightness == Brightness.dark
-                        ? (context, tileWidget, tile) =>
-                            darkModeTileBuilder(context, tileWidget, tile)
-                        : null,
+                    tileBuilder:
+                        Theme.of(context).brightness == Brightness.dark &&
+                                _selectedMapLayer == MapLayer.streets
+                            ? (context, tileWidget, tile) =>
+                                darkModeTileBuilder(context, tileWidget, tile)
+                            : null,
                     urlTemplate: _selectedMapLayer == MapLayer.streets
                         ? 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
                         : 'https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
