@@ -12,8 +12,8 @@ dependencies:
   dynamic_color: ^1.7.0
   flutter:
     sdk: flutter
-  flutter_map: ^6.1.0
-  flutter_map_line_editor: ^6.0.0
+  flutter_map: ^7.0.2
+  flutter_map_line_editor: ^7.0.0
   flutter_spinbox: ^0.13.1
   latlong2: ^0.9.0
   provider: ^6.1.2
@@ -22,9 +22,9 @@ dependencies:
     path: ./packages/dji_waypoint_engine
   litchi_waypoint_engine:
     path: ./packages/litchi_waypoint_engine
-  flutter_map_dragmarker: ^6.0.0
+  flutter_map_dragmarker: ^7.0.0
   shared_preferences: ^2.2.3
-  flutter_map_cancellable_tile_provider: ^2.0.0
+  flutter_map_cancellable_tile_provider: ^3.0.2
   archive: ^3.6.1
   file_picker: ^8.0.6
   path: ^1.9.0

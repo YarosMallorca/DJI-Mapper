@@ -97,6 +97,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  dart_earcut:
+    dependency: transitive
+    description:
+      name: dart_earcut
+      sha256: "41b493147e30a051efb2da1e3acb7f38fe0db60afba24ac1ea5684cee272721e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   dio:
     dependency: "direct main"
     description:
@@ -185,34 +193,34 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_map
-      sha256: "87cc8349b8fa5dccda5af50018c7374b6645334a0d680931c1fe11bce88fa5bb"
+      sha256: "2ecb34619a4be19df6f40c2f8dce1591675b4eff7a6857bd8f533706977385da"
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.1"
+    version: "7.0.2"
   flutter_map_cancellable_tile_provider:
     dependency: "direct main"
     description:
       name: flutter_map_cancellable_tile_provider
-      sha256: ae18dd59faf74f3eca1d28f83e59b47741bbff962e123bbebe9335c04d432f44
+      sha256: "03662220ce0cd784ad2f2a45c36fc379b8b315c74f5c12b5ff4a0515eab1acd1"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "3.0.2"
   flutter_map_dragmarker:
     dependency: "direct main"
     description:
       name: flutter_map_dragmarker
-      sha256: "46a8809d3ede852a349c8a9e075df4a969c41860542b09310f381c8b538d1b03"
+      sha256: e7ab425758243d9eb824c0ecdc094583a93ffac5b6e58bdb051de4f83110fe81
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.0"
+    version: "7.0.0"
   flutter_map_line_editor:
     dependency: "direct main"
     description:
       name: flutter_map_line_editor
-      sha256: f422266f6fde6a66630e3f6a8bd666c682c29a9fa384f8c79ae5bd3dd4981c43
+      sha256: "2a8c5a8e22bc4879e017e4a47fb502608d671c5039cc4604880088fb0de9d14a"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.0"
+    version: "7.0.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
