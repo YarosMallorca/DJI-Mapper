@@ -241,15 +241,15 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                     userAgentPackageName: 'com.yarosfpv.dji_mapper',
                     subdomains: const ['mt0', 'mt1', 'mt2', 'mt3']),
                 PolygonLayer(polygons: [
-                  Polygon(
-                      points: listenables.polygon,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withOpacity(0.3),
-                      isFilled: true,
-                      borderColor: Theme.of(context).colorScheme.primary,
-                      borderStrokeWidth: 3),
+                  if (listenables.polygon.length > 1)
+                    Polygon(
+                        points: listenables.polygon,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withOpacity(0.3),
+                        borderColor: Theme.of(context).colorScheme.primary,
+                        borderStrokeWidth: 3),
                 ]),
                 PolylineLayer(polylines: [
                   listenables.flightLine ?? Polyline(points: [])

@@ -1,4 +1,4 @@
-library litchi_waypoint_engine;
+library;
 
 export 'src/enums.dart';
 export 'src/waypoint.dart';

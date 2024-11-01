@@ -1,4 +1,4 @@
-library dji_waypoint_engine;
+library;
 
 export 'src/enums.dart';
 export 'src/action_function_parameters.dart';
