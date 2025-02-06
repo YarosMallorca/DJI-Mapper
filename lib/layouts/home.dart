@@ -185,7 +185,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
           rotate: false,
           child: Container(
             decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.primary.withAlpha(179),
                 borderRadius: BorderRadius.circular(10)),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -249,7 +249,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                         color: Theme.of(context)
                             .colorScheme
                             .primary
-                            .withOpacity(0.3),
+                            .withAlpha(77),
                         borderColor: Theme.of(context).colorScheme.primary,
                         borderStrokeWidth: 3),
                 ]),
@@ -438,6 +438,34 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
+                // Slider overlay to control rotation
+                if (listenables.polygon.length > 2 && listenables.altitude >= 5) 
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      child: Card(
+                        elevation: 4.0,
+                        color: Colors.black.withAlpha(128),
+                        child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                            maxHeight: 40, maxWidth: 300),
+                          child: Slider(
+                            value: listenables.rotation.toDouble(),
+                            min: -90,
+                            max: 90,
+                            divisions: 180,
+                            label: '${listenables.rotation.toStringAsFixed(0)}°',
+                            onChanged: (value) {
+                              setState(() {
+                                listenables.rotation = value.toInt();
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

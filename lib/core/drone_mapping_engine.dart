@@ -127,7 +127,7 @@ class DroneMappingEngine {
   List<LatLng> generateWaypoints(List<LatLng> polygon) {
     var localPolygon = _latLngToMeters(polygon);
     var rotatedPolygon = _rotatePolygon(
-        localPolygon, -angle); // Rotate polygon to align with the grid
+        localPolygon, angle); // Rotate polygon to align with the grid
     var origin = polygon[0];
 
     num minX = rotatedPolygon.map((p) => p.x).reduce(min);
@@ -153,7 +153,7 @@ class DroneMappingEngine {
     }
 
     // Rotate waypoints back to the original orientation
-    var rotatedWaypointsBack = _rotatePolygon(waypoints, angle);
+    var rotatedWaypointsBack = _rotatePolygon(waypoints, -angle);
 
     return _metersToLatLng(rotatedWaypointsBack, origin);
   }
