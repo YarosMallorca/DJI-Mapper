@@ -173,7 +173,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       angle: listenables.rotation.toDouble(),
     );
 
-    var waypoints = droneMapping.generateWaypoints(listenables.polygon);
+    var waypoints = droneMapping.generateWaypoints(listenables.polygon, listenables.createCameraPoints);
     listenables.photoLocations = waypoints;
     if (waypoints.isEmpty) return;
     _photoMarkers.clear();
@@ -190,9 +190,14 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.photo_camera,
-                    size: 25,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer),
+                if(listenables.createCameraPoints)
+                  Icon(Icons.photo_camera,
+                      size: 25,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer)
+                else
+                  Icon(Icons.place_sharp,
+                      size: 25,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer)
               ],
             ),
           )));
@@ -256,7 +261,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                 PolylineLayer(polylines: [
                   listenables.flightLine ?? Polyline(points: [])
                 ]),
-                if (listenables.showCameras)
+                if (listenables.showPoints)
                   MarkerLayer(markers: _photoMarkers),
                 DragMarkers(markers: [
                   for (var point in listenables.polygon)
