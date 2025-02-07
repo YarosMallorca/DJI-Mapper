@@ -111,15 +111,42 @@ class _AircraftBarState extends State<AircraftBar> {
                         _updateSettings(listenables);
                       },
                     ),
-                    CustomTextField(
-                      labelText: "Rotation (deg)",
-                      min: 0,
-                      max: 360,
-                      defaultValue: listenables.rotation,
-                      onChanged: (degrees) {
-                        listenables.rotation = degrees.round();
-                        _updateSettings(listenables);
-                      },
+                    Container(
+                      decoration: BoxDecoration(
+                        border:
+                            Border.all(color: Theme.of(context).dividerColor),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 6),
+                      padding: EdgeInsets.all(8),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Rotation (°)"),
+                              Text("${listenables.rotation}°"),
+                            ],
+                          ),
+                          Slider(
+                            value: listenables.rotation.toDouble(),
+                            min: -90,
+                            max: 90,
+                            divisions: 180,
+                            label:
+                                '${listenables.rotation.toStringAsFixed(0)}°',
+                            onChanged: (value) {
+                              setState(() {
+                                listenables.rotation = value.round();
+                                _updateSettings(listenables);
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                     CustomTextField(
                       labelText: "Camera angle (deg)",
