@@ -185,7 +185,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
           rotate: false,
           child: Container(
             decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.primary.withAlpha(179),
                 borderRadius: BorderRadius.circular(10)),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -246,10 +246,8 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                   if (listenables.polygon.length > 1)
                     Polygon(
                         points: listenables.polygon,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.3),
+                        color:
+                            Theme.of(context).colorScheme.primary.withAlpha(77),
                         borderColor: Theme.of(context).colorScheme.primary,
                         borderStrokeWidth: 3),
                 ]),
