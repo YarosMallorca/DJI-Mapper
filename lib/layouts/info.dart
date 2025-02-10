@@ -52,6 +52,14 @@ class _InfoState extends State<Info> {
                   listenables.showPoints = value;
                 });
               }),
+          SwitchListTile(
+              title: const Text("Fill Grid"),
+              value: listenables.fillGrid,
+              onChanged: (value) {
+                setState(() {
+                  listenables.fillGrid = value;
+                });
+              }),
           Card(
               child: Padding(
             padding: const EdgeInsets.all(8.0),

@@ -133,9 +133,9 @@ class _AircraftBarState extends State<AircraftBar> {
                           ),
                           Slider(
                             value: listenables.rotation.toDouble(),
-                            min: -90,
-                            max: 90,
-                            divisions: 180,
+                            min: -180,
+                            max: 180,
+                            divisions: 360,
                             label:
                                 '${listenables.rotation.toStringAsFixed(0)}°',
                             onChanged: (value) {
