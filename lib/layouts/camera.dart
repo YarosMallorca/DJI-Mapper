@@ -14,32 +14,7 @@ class CameraBar extends StatefulWidget {
 }
 
 class _CameraBarState extends State<CameraBar> {
-  late List<CameraPreset> _presets;
-
-  @override
-  void initState() {
-    super.initState();
-    _presets = PresetManager.getPresets();
-
-    final listenables = Provider.of<ValueListenables>(context, listen: false);
-
-    // Load the latest preset
-    var latestPresetName = prefs.getString("latestPreset");
-    if (latestPresetName == null) {
-      latestPresetName = _presets[0].name;
-      prefs.setString("latestPreset", latestPresetName);
-    }
-
-    // Select the latest preset
-    listenables.selectedCameraPreset = _presets.firstWhere(
-        (element) => element.name == latestPresetName,
-        orElse: () => _presets[0]);
-
-    // Update listenables
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _updateProvider(listenables);
-    });
-  }
+  late List<CameraPreset> _presets = PresetManager.getPresets();
 
   void _updatePreset(ValueListenables listenables) {
     PresetManager.updatePreset(

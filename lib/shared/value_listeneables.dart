@@ -163,10 +163,10 @@ class ValueListenables extends ChangeNotifier {
     notifyListeners();
   }
 
-  final _selectedCamearPreset = ValueNotifier<CameraPreset?>(null);
-  CameraPreset? get selectedCameraPreset => _selectedCamearPreset.value;
+  final _selectedCameraPreset = ValueNotifier<CameraPreset?>(null);
+  CameraPreset? get selectedCameraPreset => _selectedCameraPreset.value;
   set selectedCameraPreset(CameraPreset? value) {
-    _selectedCamearPreset.value = value;
+    _selectedCameraPreset.value = value;
   }
 
   void notify() => notifyListeners();

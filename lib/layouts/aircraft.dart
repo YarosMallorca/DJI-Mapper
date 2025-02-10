@@ -13,27 +13,6 @@ class AircraftBar extends StatefulWidget {
 }
 
 class _AircraftBarState extends State<AircraftBar> {
-  @override
-  void initState() {
-    final listenables = Provider.of<ValueListenables>(context, listen: false);
-
-    final settings = AircraftSettings.getAircraftSettings();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      listenables.altitude = settings.altitude;
-      listenables.speed = settings.speed;
-      listenables.forwardOverlap = settings.forwardOverlap;
-      listenables.sideOverlap = settings.sideOverlap;
-      listenables.rotation = settings.rotation;
-      listenables.delayAtWaypoint = settings.delay;
-      listenables.cameraAngle = settings.cameraAngle;
-      listenables.onFinished = settings.finishAction;
-      listenables.rcLostAction = settings.rcLostAction;
-    });
-
-    super.initState();
-  }
-
   void _updateSettings(ValueListenables listenables) {
     AircraftSettings.saveAircraftSettings(AircraftSettings(
       altitude: listenables.altitude,

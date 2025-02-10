@@ -54,26 +54,46 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
     _selectedMapLayer =
         prefs.getInt("mapLayer") == 1 ? MapLayer.satellite : MapLayer.streets;
 
-    final presets = PresetManager.getPresets();
-    Provider.of<ValueListenables>(context, listen: false).selectedCameraPreset =
-        presets[0];
-
     final listenables = Provider.of<ValueListenables>(context, listen: false);
 
-    final settings = AircraftSettings.getAircraftSettings();
-
+    // Preload aircraft settings
+    final aircraftSettings = AircraftSettings.getAircraftSettings();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      listenables.altitude = settings.altitude;
-      listenables.speed = settings.speed;
-      listenables.forwardOverlap = settings.forwardOverlap;
-      listenables.sideOverlap = settings.sideOverlap;
-      listenables.rotation = settings.rotation;
-      listenables.delayAtWaypoint = settings.delay;
-      listenables.cameraAngle = settings.cameraAngle;
-      listenables.onFinished = settings.finishAction;
-      listenables.rcLostAction = settings.rcLostAction;
+      listenables.altitude = aircraftSettings.altitude;
+      listenables.speed = aircraftSettings.speed;
+      listenables.forwardOverlap = aircraftSettings.forwardOverlap;
+      listenables.sideOverlap = aircraftSettings.sideOverlap;
+      listenables.rotation = aircraftSettings.rotation;
+      listenables.delayAtWaypoint = aircraftSettings.delay;
+      listenables.cameraAngle = aircraftSettings.cameraAngle;
+      listenables.onFinished = aircraftSettings.finishAction;
+      listenables.rcLostAction = aircraftSettings.rcLostAction;
     });
 
+    var cameraPresets = PresetManager.getPresets();
+
+    // Load the latest camera preset
+    var latestPresetName = prefs.getString("latestPreset");
+    if (latestPresetName == null) {
+      latestPresetName = cameraPresets[0].name;
+      prefs.setString("latestPreset", latestPresetName);
+    }
+
+    // Select the latest camera preset
+    listenables.selectedCameraPreset = cameraPresets.firstWhere(
+        (element) => element.name == latestPresetName,
+        orElse: () => cameraPresets[0]);
+
+    // Load camera settings into the provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      listenables.sensorWidth = listenables.selectedCameraPreset!.sensorWidth;
+      listenables.sensorHeight = listenables.selectedCameraPreset!.sensorHeight;
+      listenables.focalLength = listenables.selectedCameraPreset!.focalLength;
+      listenables.imageWidth = listenables.selectedCameraPreset!.imageWidth;
+      listenables.imageHeight = listenables.selectedCameraPreset!.imageHeight;
+    });
+
+    // Check for updates
     if (!kIsWeb) {
       UpdateChecker.checkForUpdate().then((latestVersion) => {
             if (latestVersion != null && mounted)
@@ -173,7 +193,8 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       angle: listenables.rotation.toDouble(),
     );
 
-    var waypoints = droneMapping.generateWaypoints(listenables.polygon, listenables.createCameraPoints, listenables.fillGrid);
+    var waypoints = droneMapping.generateWaypoints(listenables.polygon,
+        listenables.createCameraPoints, listenables.fillGrid);
     listenables.photoLocations = waypoints;
     if (waypoints.isEmpty) return;
     _photoMarkers.clear();
@@ -190,7 +211,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if(listenables.createCameraPoints)
+                if (listenables.createCameraPoints)
                   Icon(Icons.photo_camera,
                       size: 25,
                       color: Theme.of(context).colorScheme.onPrimaryContainer)
@@ -260,8 +281,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                 PolylineLayer(polylines: [
                   listenables.flightLine ?? Polyline(points: [])
                 ]),
-                if (listenables.showPoints)
-                  MarkerLayer(markers: _photoMarkers),
+                if (listenables.showPoints) MarkerLayer(markers: _photoMarkers),
                 DragMarkers(markers: [
                   for (var point in listenables.polygon)
                     DragMarker(
