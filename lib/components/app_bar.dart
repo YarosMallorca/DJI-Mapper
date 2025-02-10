@@ -87,11 +87,13 @@ class _MappingAppBarState extends State<MappingAppBar> {
                 onSelected: (value) {
                   switch (value) {
                     case "dji_help":
+                      Navigator.pop(context);
                       showDialog(
                           context: context,
                           builder: (context) =>
                               const DjiLoadAlert(showCheckbox: false));
                     case "litchi_help":
+                      Navigator.pop(context);
                       showDialog(
                           context: context,
                           builder: (context) =>
