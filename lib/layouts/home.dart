@@ -173,7 +173,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       angle: listenables.rotation.toDouble(),
     );
 
-    var waypoints = droneMapping.generateWaypoints(listenables.polygon, listenables.createCameraPoints);
+    var waypoints = droneMapping.generateWaypoints(listenables.polygon, listenables.createCameraPoints, listenables.fillGrid);
     listenables.photoLocations = waypoints;
     if (waypoints.isEmpty) return;
     _photoMarkers.clear();
@@ -217,6 +217,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
             _buildMarkers(listenables);
           } else {
             listenables.photoLocations.clear();
+            _photoMarkers.clear();
             listenables.flightLine = null;
           }
         });

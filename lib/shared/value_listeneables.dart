@@ -107,6 +107,14 @@ class ValueListenables extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// fill the generated flight grid with a crosshatch flight pattern
+  final _fillGrid = ValueNotifier<bool>(false);
+  bool get fillGrid => _fillGrid.value;
+  set fillGrid(bool value) {
+    _fillGrid.value = value;
+    notifyListeners();
+  }
+
   /// Create camera point locations
   final _createCameraPoints = ValueNotifier<bool>(false);
   bool get createCameraPoints => _createCameraPoints.value;
