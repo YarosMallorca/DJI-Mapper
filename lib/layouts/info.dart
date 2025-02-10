@@ -37,19 +37,31 @@ class _InfoState extends State<Info> {
         mainAxisSize: MainAxisSize.min,
         children: [
           SwitchListTile(
-              title: const Text("Show Camera Locations"),
-              value: listenables.showCameras,
+              title: const Text("Create Photo Points"),
+              value: listenables.createCameraPoints,
               onChanged: (value) {
                 setState(() {
-                  listenables.showCameras = value;
+                  listenables.createCameraPoints = value;
+                });
+              }),
+          SwitchListTile(
+              title: const Text("Show Waypoints"),
+              value: listenables.showPoints,
+              onChanged: (value) {
+                setState(() {
+                  listenables.showPoints = value;
                 });
               }),
           Card(
               child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Text("Number of photos: ${listenables.photoLocations.length}",
-                  style: const TextStyle(fontSize: 16)),
+              if(listenables.createCameraPoints)
+                Text("Number of photos: ${listenables.photoLocations.length}",
+                    style: const TextStyle(fontSize: 16))
+              else
+                Text("Number of waypoints: ${listenables.photoLocations.length}",
+                    style: const TextStyle(fontSize: 16)),
               const Divider(),
               Text("Flight distance: $totalDistance m",
                   style: const TextStyle(fontSize: 16)),

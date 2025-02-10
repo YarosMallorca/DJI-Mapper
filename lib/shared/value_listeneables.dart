@@ -99,11 +99,19 @@ class ValueListenables extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Show camera locations
-  final _showCameras = ValueNotifier<bool>(false);
-  bool get showCameras => _showCameras.value;
-  set showCameras(bool value) {
-    _showCameras.value = value;
+  /// Show point locations
+  final _showPoints = ValueNotifier<bool>(false);
+  bool get showPoints => _showPoints.value;
+  set showPoints(bool value) {
+    _showPoints.value = value;
+    notifyListeners();
+  }
+
+  /// Create camera point locations
+  final _createCameraPoints = ValueNotifier<bool>(false);
+  bool get createCameraPoints => _createCameraPoints.value;
+  set createCameraPoints(bool value) {
+    _createCameraPoints.value = value;
     notifyListeners();
   }
 

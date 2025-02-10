@@ -124,7 +124,7 @@ class DroneMappingEngine {
   }
 
   // Generate waypoints within the polygon in a boustrophedon pattern
-  List<LatLng> generateWaypoints(List<LatLng> polygon) {
+  List<LatLng> generateWaypoints(List<LatLng> polygon, bool createCameraPoints) {
     var localPolygon = _latLngToMeters(polygon);
     var rotatedPolygon = _rotatePolygon(
         localPolygon, angle); // Rotate polygon to align with the grid
@@ -139,11 +139,29 @@ class DroneMappingEngine {
     bool reverse = false;
     for (num y = minY; y <= maxY; y += pathSpacing) {
       List<Point> line = [];
+      Point point;
+      Point lastpoint = Point(0, 0);
+      bool firstpoint = false;
+      bool lastpointfound = false;
       for (num x = minX; x <= maxX; x += flightLineSpacing) {
-        Point point = Point(x, y);
+        point = Point(x, y);
         if (_isPointInPolygon(point, rotatedPolygon)) {
-          line.add(point);
+          if (createCameraPoints) {
+            line.add(point);
+          } else {
+            if(!firstpoint) {
+              line.add(point);
+              firstpoint = true;
+            }
+            if(firstpoint) {
+              lastpoint = point;
+              lastpointfound = true;
+            }
+          }
         }
+      }
+      if(lastpointfound && !createCameraPoints) {
+        line.add(lastpoint);
       }
       if (reverse) {
         line = line.reversed.toList();
