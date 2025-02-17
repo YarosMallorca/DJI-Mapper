@@ -220,8 +220,7 @@ class ExportBarState extends State<ExportBar> {
 
                   // Litchi uses milliseconds for delay time
                   actionParam: listenables.delayAtWaypoint.toDouble() * 1000),
-
-            if(listenables.createCameraPoints)
+            if (listenables.createCameraPoints)
               litchi.Action(actionType: litchi.ActionType.takePhoto)
           ]));
     }
@@ -267,7 +266,7 @@ class ExportBarState extends State<ExportBar> {
                       actionFunction: ActionFunction.hover,
                       actionParams:
                           HoverParams(hoverTime: listenables.delayAtWaypoint)),
-                if(listenables.createCameraPoints)
+                if (listenables.createCameraPoints)
                   Action(
                       id: id,
                       actionFunction: ActionFunction.takePhoto,
@@ -510,14 +509,12 @@ class ExportBarState extends State<ExportBar> {
                 decoration: BoxDecoration(
                     border: Border.all(
                         width: 3,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .error
-                            .withOpacity(0.5)),
+                        color:
+                            Theme.of(context).colorScheme.error.withAlpha(127)),
                     color: Theme.of(context)
                         .colorScheme
                         .errorContainer
-                        .withOpacity(0.1),
+                        .withAlpha(25),
                     borderRadius: BorderRadius.circular(10)),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
