@@ -45,7 +45,7 @@ class _InfoState extends State<Info> {
                 });
               }),
           SwitchListTile(
-              title: const Text("Show Waypoints"),
+              title: Text((listenables.createCameraPoints)?"Show Photo Points":"Show Waypoints" ),
               value: listenables.showPoints,
               onChanged: (value) {
                 setState(() {

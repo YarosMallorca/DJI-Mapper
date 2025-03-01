@@ -54,6 +54,10 @@ class DroneMappingEngine {
   double get flightLineSpacing => footprintWidth * (1 - sideOverlap);
   double get pathSpacing => footprintHeight * (1 - forwardOverlap);
 
+  // Spacing for horizontal lines
+  double get horizontalLineSpacing => footprintHeight * (1 - sideOverlap);      // Y spacing (cross-track)
+  double get horizontalWaypointSpacing => footprintWidth * (1 - forwardOverlap); // X spacing (along-track)
+
   // Convert LatLng to local coordinate system (in meters)
   static List<Point> _latLngToMeters(List<LatLng> polygon) {
     var origin = polygon[0];
@@ -137,10 +141,10 @@ class DroneMappingEngine {
     List<Point> waypoints = [];
     bool reverse = false;
 
-    for (num y = minY; y <= maxY; y += pathSpacing) {
+    for (num y = minY; y <= maxY; y += horizontalLineSpacing) {
       List<Point> line = [];
       if (createCameraPoints) {
-        for (num x = minX; x <= maxX; x += flightLineSpacing) {
+        for (num x = minX; x <= maxX; x += horizontalWaypointSpacing) {
           Point p = Point(x, y);
           if (_isPointInPolygon(p, rotatedPolygon)) {
             line.add(p);
@@ -158,7 +162,7 @@ class DroneMappingEngine {
       } else {
         Point? firstPoint;
         Point? lastPoint;
-        for (num x = minX; x <= maxX; x += flightLineSpacing) {
+        for (num x = minX; x <= maxX; x += horizontalWaypointSpacing) {
           Point p = Point(x, y);
           if (_isPointInPolygon(p, rotatedPolygon)) {
             firstPoint ??= p;
@@ -187,17 +191,14 @@ class DroneMappingEngine {
 
     Point lastHorizontalPoint = waypoints.isNotEmpty ? waypoints.last : Point(minX, minY);
 
-    if (fillGrid) {
-      List<Point> verticalWaypoints = generateVerticalWaypoints(
-        rotatedPolygon,
-        createCameraPoints,
-        lastHorizontalPoint,
-        minX,
-        maxX,
-        minY,
-        maxY,
-      );
-      waypoints.addAll(verticalWaypoints);
+    if (fillGrid && waypoints.isNotEmpty) {
+        num minHorizontalX = waypoints.isNotEmpty ? waypoints.map((p) => p.x).reduce(min) : minX;
+        num maxHorizontalX = waypoints.isNotEmpty ? waypoints.map((p) => p.x).reduce(max) : maxX;
+        num minHorizontalY = waypoints.isNotEmpty ? waypoints.map((p) => p.y).reduce(min) : minY;
+        num maxHorizontalY = waypoints.isNotEmpty ? waypoints.map((p) => p.y).reduce(max) : maxY;
+
+        List<Point> verticalWaypoints = generateVerticalWaypoints(rotatedPolygon, createCameraPoints, lastHorizontalPoint, minHorizontalX, maxHorizontalX, minHorizontalY, maxHorizontalY);
+        waypoints.addAll(verticalWaypoints);
     }
 
     // Rotate the combined waypoints back to the original orientation.
@@ -205,27 +206,62 @@ class DroneMappingEngine {
     return _metersToLatLng(rotatedWaypointsBack, origin);
   }
 
-  /// Generates a vertical boustrophedon pattern to “fill” the polygon.
-  List<Point> generateVerticalWaypoints(List<Point> polygon, bool createCameraPoints, Point lastHorizontal, num minX, num maxX, num minY, num maxY) {
+  // Generates a vertical boustrophedon pattern to fill the polygon.
+  List<Point> generateVerticalWaypoints(List<Point> polygon, bool createCameraPoints, Point lastHorizontal, num minHorizontalX, num maxHorizontalX, num minHorizontalY, num maxHorizontalY) {
     List<Point> verticalWaypoints = [];
-
-    num startX;
-    num deltaX;
-    if ((lastHorizontal.x - minX).abs() <= (maxX - lastHorizontal.x).abs()) {
-      startX = minX;
-      deltaX = pathSpacing; // move rightwards from the left edge
-    } else {
-      startX = maxX;
-      deltaX = -pathSpacing; // move leftwards from the right edge
-    }
+    num verticalLineSpacing = horizontalLineSpacing; //footprintWidth * (1 - sideOverlap);
+    num verticalWaypointSpacing = footprintHeight * (1 - forwardOverlap);
+    num offset = verticalWaypointSpacing * 0.1; // e.g., 10% of vertical spacing
 
     List<num> verticalYCoords = [];
-    for (num y = minY; y <= maxY; y += pathSpacing) {
+    num adjustedMinY = minHorizontalY - verticalWaypointSpacing / 2 - offset;
+    for (num y = adjustedMinY; y <= maxHorizontalY + verticalWaypointSpacing / 2; y += verticalWaypointSpacing) {
       verticalYCoords.add(y);
     }
 
-    bool reverse = false;
-    bool condition(num x) => deltaX > 0 ? x <= maxX : x >= minX;
+    // Calculate potential starting points on left and right edges
+    num xLeft = minHorizontalX + verticalLineSpacing / 2;
+    List<num> yLeft = verticalYCoords.where((y) => _isPointInPolygon(Point(xLeft, y), polygon)).toList();
+    num minDistLeft = double.infinity;
+    num distBottomLeft = double.infinity;
+    num distTopLeft = double.infinity;
+    if (yLeft.isNotEmpty) {
+      num yBottomLeft = yLeft.first;
+      num yTopLeft = yLeft.last;
+      distBottomLeft = sqrt(pow(xLeft - lastHorizontal.x, 2) + pow(yBottomLeft - lastHorizontal.y, 2));
+      distTopLeft = sqrt(pow(xLeft - lastHorizontal.x, 2) + pow(yTopLeft - lastHorizontal.y, 2));
+      minDistLeft = min(distBottomLeft, distTopLeft);
+    }
+
+    num xRight = maxHorizontalX - verticalLineSpacing / 2;
+    List<num> yRight = verticalYCoords.where((y) => _isPointInPolygon(Point(xRight, y), polygon)).toList();
+    num minDistRight = double.infinity;
+    num distBottomRight = double.infinity;
+    num distTopRight = double.infinity;
+    if (yRight.isNotEmpty) {
+      num yBottomRight = yRight.first;
+      num yTopRight = yRight.last;
+      distBottomRight = sqrt(pow(xRight - lastHorizontal.x, 2) + pow(yBottomRight - lastHorizontal.y, 2));
+      distTopRight = sqrt(pow(xRight - lastHorizontal.x, 2) + pow(yTopRight - lastHorizontal.y, 2));
+      minDistRight = min(distBottomRight, distTopRight);
+    }
+
+    // Determine starting X, direction, and initial reverse flag
+    num startX;
+    num deltaX;
+    bool reverse;
+    if (minDistLeft < minDistRight) {
+      startX = xLeft;
+      deltaX = verticalLineSpacing; // Move right
+      reverse = distTopLeft < distBottomLeft; // True: top-to-bottom, False: bottom-to-top
+    } else {
+      startX = xRight;
+      deltaX = -verticalLineSpacing; // Move left
+      reverse = distTopRight < distBottomRight; // True: top-to-bottom, False: bottom-to-top
+    }
+
+    // Generate vertical waypoints with boustrophedon pattern
+    bool condition(num x) => deltaX > 0 ? x <= maxHorizontalX + verticalLineSpacing / 2 : x >= minHorizontalX - verticalLineSpacing / 2;
 
     for (num x = startX; condition(x); x += deltaX) {
       List<Point> column = [];
@@ -237,34 +273,26 @@ class DroneMappingEngine {
       }
       if (column.isEmpty) continue;
 
-      if (!createCameraPoints) {
-        Point lowerEndpoint = column.first;
-        Point upperEndpoint = column.last;
-        if (x == startX) {
-          double distToLower = (lastHorizontal.y - lowerEndpoint.y).abs().toDouble();
-          double distToUpper = (lastHorizontal.y - upperEndpoint.y).abs().toDouble();
-          if (distToLower <= distToUpper) {
-            column = [lowerEndpoint, upperEndpoint];
-          } else {
-            column = [upperEndpoint, lowerEndpoint];
-          }
-        } else {
-          column = [lowerEndpoint, upperEndpoint];
-        }
+      if (createCameraPoints) {
+        if (reverse) column = column.reversed.toList();
+        verticalWaypoints.addAll(column);
       } else {
-        if (x == startX && column.length >= 2) {
-          double distToLower = (lastHorizontal.y - column.first.y).abs().toDouble();
-          double distToUpper = (lastHorizontal.y - column.last.y).abs().toDouble();
-          if (distToUpper < distToLower) {
-            column = column.reversed.toList();
+        if (column.isNotEmpty) {
+          Point firstPoint = column.first;
+          Point lastPoint = column.last;
+          if (reverse) {
+            verticalWaypoints.add(lastPoint);
+            if (lastPoint != firstPoint) {
+              verticalWaypoints.add(firstPoint);
+            }
+          } else {
+            verticalWaypoints.add(firstPoint);
+            if (firstPoint != lastPoint) {
+              verticalWaypoints.add(lastPoint);
+            }
           }
         }
       }
-
-      if (reverse) {
-        column = column.reversed.toList();
-      }
-      verticalWaypoints.addAll(column);
       reverse = !reverse;
     }
 
