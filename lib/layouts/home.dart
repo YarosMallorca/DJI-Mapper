@@ -279,7 +279,8 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                         borderStrokeWidth: 3),
                 ]),
                 PolylineLayer(polylines: [
-                  listenables.flightLine ?? Polyline(points: [])
+                  if(listenables.flightLine != null)
+                    listenables.flightLine ?? Polyline(points: [])
                 ]),
                 if (listenables.showPoints) MarkerLayer(markers: _photoMarkers),
                 DragMarkers(markers: [
