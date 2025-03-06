@@ -99,9 +99,8 @@ class ExportBarState extends State<ExportBar> {
     if (!kIsWeb) {
       outputPath = await FilePicker.platform.saveFile(
           type: FileType.custom,
-          fileName: "output.kmz",
+          fileName: "output",
           allowedExtensions: ["kmz"],
-          bytes: zipBytes,
           dialogTitle: "Save Mission");
 
       if (outputPath == null) {
@@ -159,9 +158,8 @@ class ExportBarState extends State<ExportBar> {
     if (!kIsWeb) {
       outputPath = await FilePicker.platform.saveFile(
           type: FileType.custom,
-          fileName: "litchi_mission.csv",
+          fileName: "litchi_mission",
           allowedExtensions: ["csv"],
-          bytes: Uint8List.fromList(csvContent.codeUnits),
           dialogTitle: "Save Mission");
 
       if (outputPath == null) {
@@ -413,9 +411,8 @@ class ExportBarState extends State<ExportBar> {
     if (!kIsWeb) {
       outputPath = await FilePicker.platform.saveFile(
           type: FileType.custom,
-          fileName: "area.kml",
+          fileName: "area",
           allowedExtensions: ["kml"],
-          bytes: Uint8List.fromList(kmlString.codeUnits),
           dialogTitle: "Save Area");
 
       if (outputPath == null) {
