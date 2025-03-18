@@ -76,7 +76,15 @@ class PresetManager {
         sensorHeight: 6.14,
         focalLength: 9.10,
         imageWidth: 640,
-        imageHeight: 512)
+        imageHeight: 512),
+    CameraPreset(
+        name: "DJI Air 3S",
+        defaultPreset: true,
+        sensorWidth: 13.2,
+        sensorHeight: 8.8,
+        focalLength: 24.00,
+        imageWidth: 8192,
+        imageHeight: 6144)
   ];
 
   /// Sets the default presets
