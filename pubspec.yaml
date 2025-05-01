@@ -30,7 +30,7 @@ dependencies:
   path: ^1.9.0
   universal_html: ^2.2.4
   url_launcher: ^6.3.1
-  geolocator: ^13.0.4
+  geolocator: ^14.0.0
   dio: ^5.8.0+1
   package_info_plus: ^8.3.0
   geoxml: ^2.6.1
