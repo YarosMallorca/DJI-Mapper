@@ -299,10 +299,10 @@ packages:
     dependency: "direct main"
     description:
       name: geoxml
-      sha256: dfcbe7f9d83839958ce3c98af6eb673ac4d24b26ee5e47ffb14858f5dc560cf6
+      sha256: "3001f183bfc5edf92e628ed36d80fc5350055edc2fed8ab8a95185f5f05f4134"
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.1"
+    version: "2.6.2"
   html:
     dependency: transitive
     description:
