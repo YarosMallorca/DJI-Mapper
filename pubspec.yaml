@@ -16,7 +16,7 @@ dependencies:
   flutter_map_line_editor: ^8.0.0
   flutter_spinbox: ^0.13.1
   latlong2: ^0.9.0
-  provider: ^6.1.4
+  provider: ^6.1.5
   xml: ^6.5.0
   dji_waypoint_engine:
     path: ./packages/dji_waypoint_engine
