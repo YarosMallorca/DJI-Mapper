@@ -33,7 +33,7 @@ dependencies:
   geolocator: ^13.0.4
   dio: ^5.8.0+1
   package_info_plus: ^8.3.0
-  geoxml: ^2.6.1
+  geoxml: ^2.6.2
   universal_io: ^2.2.2
 
 dependency_overrides:
