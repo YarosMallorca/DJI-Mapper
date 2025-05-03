@@ -209,10 +209,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_map_dragmarker
-      sha256: "0943f67081416031276a4a68c55520db2bc32074ea18094cd9493aa33297fd23"
+      sha256: d73ca9e1c30b1a906a010053594f5957a5d1d8551d3d3ff1267a6f3ff88f4d26
       url: "https://pub.dev"
     source: hosted
-    version: "8.0.2"
+    version: "8.0.3"
   flutter_map_line_editor:
     dependency: "direct main"
     description:
