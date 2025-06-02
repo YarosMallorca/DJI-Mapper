@@ -26,7 +26,7 @@ dependencies:
   shared_preferences: ^2.5.3
   flutter_map_cancellable_tile_provider: ^3.1.0
   archive: ^3.6.1
-  file_picker: ^10.1.2
+  file_picker: ^10.1.9
   path: ^1.9.0
   universal_html: ^2.2.4
   url_launcher: ^6.3.1
