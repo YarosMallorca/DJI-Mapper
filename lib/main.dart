@@ -1,5 +1,6 @@
 import 'package:dji_mapper/layouts/home.dart';
 import 'package:dji_mapper/presets/preset_manager.dart';
+import 'package:dji_mapper/shared/map_provider.dart';
 import 'package:dji_mapper/shared/theme_manager.dart';
 import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => ValueListenables()),
         ChangeNotifierProvider(create: (context) => ThemeManager()),
+        ChangeNotifierProvider(create: (context) => MapProvider()),
       ],
       child: DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
         return Consumer<ThemeManager>(builder: (context, theme, child) {

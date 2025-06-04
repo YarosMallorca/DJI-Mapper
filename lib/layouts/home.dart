@@ -10,6 +10,7 @@ import 'package:dji_mapper/layouts/export.dart';
 import 'package:dji_mapper/layouts/info.dart';
 import 'package:dji_mapper/main.dart';
 import 'package:dji_mapper/presets/preset_manager.dart';
+import 'package:dji_mapper/shared/map_provider.dart';
 import 'package:dji_mapper/shared/value_listeneables.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,6 @@ class HomeLayout extends StatefulWidget {
 }
 
 class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
-  final MapController mapController = MapController();
   late final TabController _tabController;
 
   late MapLayer _selectedMapLayer;
@@ -171,7 +171,9 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
     final location = await Geolocator.getCurrentPosition(
         locationSettings:
             const LocationSettings(accuracy: LocationAccuracy.low));
-    mapController.move(LatLng(location.latitude, location.longitude), 14);
+    Provider.of<MapProvider>(context, listen: false)
+        .mapController
+        .move(LatLng(location.latitude, location.longitude), 14);
   }
 
   @override
@@ -231,8 +233,8 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ValueListenables>(
-      builder: (context, listenables, _) {
+    return Consumer2<ValueListenables, MapProvider>(
+      builder: (context, listenables, mapProvider, _) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (listenables.polygon.length > 2 && listenables.altitude >= 5) {
             _buildMarkers(listenables);
@@ -247,7 +249,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
           Flexible(
             flex: 2,
             child: FlutterMap(
-              mapController: mapController,
+              mapController: mapProvider.mapController,
               options: MapOptions(
                 onTap: (tapPosition, point) => {
                   setState(() {
@@ -279,7 +281,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                         borderStrokeWidth: 3),
                 ]),
                 PolylineLayer(polylines: [
-                  if(listenables.flightLine != null)
+                  if (listenables.flightLine != null)
                     listenables.flightLine ?? Polyline(points: [])
                 ]),
                 if (listenables.showPoints) MarkerLayer(markers: _photoMarkers),
@@ -320,7 +322,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                           });
                         },
                         onSelected: (option) =>
-                            mapController.move(option.location, 12),
+                            mapProvider.mapController.move(option.location, 12),
                         optionsViewBuilder: (context, onSelected, options) {
                           return Align(
                               alignment: Alignment.topLeft,
@@ -388,8 +390,8 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                           focusNode: focusNode,
                           onFieldSubmitted: (value) async {
                             await _search(textEditingController.text);
-                            mapController.move(
-                                _searchLocations.first.location, 12);
+                            mapProvider.mapController
+                                .move(_searchLocations.first.location, 12);
                           },
                           decoration: InputDecoration(
                               hintText: 'Search location',
