@@ -9,7 +9,7 @@ environment:
   sdk: ">=3.2.3 <4.0.0"
 
 dependencies:
-  dynamic_color: ^1.7.0
+  dynamic_color: ^1.8.1
   flutter:
     sdk: flutter
   flutter_map: ^8.1.1
