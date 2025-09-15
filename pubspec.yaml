@@ -12,7 +12,7 @@ dependencies:
   dynamic_color: ^1.8.1
   flutter:
     sdk: flutter
-  flutter_map: ^8.1.1
+  flutter_map: ^8.2.1
   flutter_map_line_editor: ^8.0.0
   flutter_spinbox: ^0.13.1
   latlong2: ^0.9.0
