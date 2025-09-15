@@ -32,7 +32,7 @@ dependencies:
   url_launcher: ^6.3.1
   geolocator: ^14.0.2
   dio: ^5.9.0
-  package_info_plus: ^8.3.0
+  package_info_plus: ^8.3.1
   geoxml: ^2.6.2
   universal_io: ^2.2.2
 
