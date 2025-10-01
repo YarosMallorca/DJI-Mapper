@@ -171,6 +171,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
     final location = await Geolocator.getCurrentPosition(
         locationSettings:
             const LocationSettings(accuracy: LocationAccuracy.low));
+    if (!mounted) return;
     Provider.of<MapProvider>(context, listen: false)
         .mapController
         .move(LatLng(location.latitude, location.longitude), 14);
