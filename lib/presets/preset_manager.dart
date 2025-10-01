@@ -135,45 +135,98 @@ class PresetManager {
         imageHeight: 512),
   ];
 
-  /// Sets the default presets
+  /// Migrates old preset storage format and sets up the new system
   ///
-  /// If the camera presets are already set, it does nothing
+  /// Removes default presets from SharedPreferences if they exist
   static void init() {
-    if (prefs.getString("cameraPresets") == null) {
-      _savePresets(_defaultPresets);
+    _migrateOldPresets();
+  }
+
+  /// Migrates from the old system where all presets were saved
+  /// to the new system where only custom presets are saved
+  static void _migrateOldPresets() {
+    final String? oldPresetsJson = prefs.getString("cameraPresets");
+
+    if (oldPresetsJson != null) {
+      try {
+        final List<dynamic> oldPresetsList = jsonDecode(oldPresetsJson);
+        final List<CameraPreset> oldPresets = oldPresetsList
+            .map<CameraPreset>((preset) => CameraPreset.fromJson(preset))
+            .toList();
+
+        // Filter out default presets, keeping only custom ones
+        final List<CameraPreset> customPresets =
+            oldPresets.where((preset) => !preset.defaultPreset).toList();
+
+        // Save only custom presets
+        _saveCustomPresets(customPresets);
+        prefs.remove("cameraPresets");
+      } catch (e) {
+        // If migration fails, clear the old data
+        prefs.remove("cameraPresets");
+      }
     }
   }
 
+  /// Returns all presets: default presets first, then custom presets
   static List<CameraPreset> getPresets() {
-    return jsonDecode(prefs.getString("cameraPresets") ?? "[]")
+    final List<CameraPreset> allPresets = List.from(_defaultPresets);
+    allPresets.addAll(getCustomPresets());
+    return allPresets;
+  }
+
+  /// Returns only custom presets from SharedPreferences
+  static List<CameraPreset> getCustomPresets() {
+    return jsonDecode(prefs.getString("customCameraPresets") ?? "[]")
         .map<CameraPreset>((preset) => CameraPreset.fromJson(preset))
         .toList();
   }
 
-  static void _savePresets(List<CameraPreset> presets) {
-    prefs.setString("cameraPresets",
-        jsonEncode(presets.map((preset) => preset.toJson()).toList()));
+  /// Saves only custom presets to SharedPreferences
+  static void _saveCustomPresets(List<CameraPreset> customPresets) {
+    prefs.setString("customCameraPresets",
+        jsonEncode(customPresets.map((preset) => preset.toJson()).toList()));
   }
 
   static void addPreset(CameraPreset preset) {
-    var presets = getPresets();
-    presets.add(preset);
-    _savePresets(presets);
+    // Only add if it's a custom preset
+    if (preset.defaultPreset) {
+      throw Exception("Cannot add default preset - they are built-in");
+    }
+
+    var customPresets = getCustomPresets();
+    customPresets.add(preset);
+    _saveCustomPresets(customPresets);
   }
 
   static void deletePreset(CameraPreset preset) {
     if (preset.defaultPreset) throw Exception("Cannot delete default preset");
-    var presets = getPresets();
-    presets.remove(preset);
-    _savePresets(presets);
+
+    var customPresets = getCustomPresets();
+    customPresets.removeWhere((p) => p.name == preset.name);
+    _saveCustomPresets(customPresets);
   }
 
   static void updatePreset(int index, CameraPreset newPreset) {
-    var presets = getPresets();
-    if (presets[index].defaultPreset) {
+    var allPresets = getPresets();
+
+    if (index >= allPresets.length) {
+      throw Exception("Invalid preset index");
+    }
+
+    if (allPresets[index].defaultPreset) {
       throw Exception("Cannot update default preset");
     }
-    presets[index] = newPreset;
-    _savePresets(presets);
+
+    // Calculate the index in the custom presets list
+    var customIndex = index - _defaultPresets.length;
+    var customPresets = getCustomPresets();
+
+    if (customIndex < 0 || customIndex >= customPresets.length) {
+      throw Exception("Invalid custom preset index");
+    }
+
+    customPresets[customIndex] = newPreset;
+    _saveCustomPresets(customPresets);
   }
 }

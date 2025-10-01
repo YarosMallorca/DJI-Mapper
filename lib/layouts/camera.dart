@@ -17,16 +17,19 @@ class _CameraBarState extends State<CameraBar> {
   late List<CameraPreset> _presets = PresetManager.getPresets();
 
   void _updatePreset(ValueListenables listenables) {
-    PresetManager.updatePreset(
-        _presets.indexOf(listenables.selectedCameraPreset!),
-        CameraPreset(
-            name: listenables.selectedCameraPreset!.name,
-            defaultPreset: false,
-            sensorWidth: listenables.sensorWidth,
-            sensorHeight: listenables.sensorHeight,
-            focalLength: listenables.focalLength,
-            imageWidth: listenables.imageWidth,
-            imageHeight: listenables.imageHeight));
+    // Only update if it's not a default preset
+    if (!listenables.selectedCameraPreset!.defaultPreset) {
+      PresetManager.updatePreset(
+          _presets.indexOf(listenables.selectedCameraPreset!),
+          CameraPreset(
+              name: listenables.selectedCameraPreset!.name,
+              defaultPreset: false,
+              sensorWidth: listenables.sensorWidth,
+              sensorHeight: listenables.sensorHeight,
+              focalLength: listenables.focalLength,
+              imageWidth: listenables.imageWidth,
+              imageHeight: listenables.imageHeight));
+    }
   }
 
   /// Always called from the `AlertDialog`
@@ -133,8 +136,17 @@ class _CameraBarState extends State<CameraBar> {
                           PresetManager.deletePreset(
                               listenables.selectedCameraPreset!);
                           _presets = PresetManager.getPresets();
-                          listenables.selectedCameraPreset =
-                              _presets[previousIndex - 1];
+
+                          // Select the previous preset, but ensure we don't go below 0
+                          // If we're deleting the first custom preset, go to the last default preset
+                          int newIndex = previousIndex - 1;
+                          if (newIndex < 0) {
+                            newIndex = 0;
+                          } else if (newIndex >= _presets.length) {
+                            newIndex = _presets.length - 1;
+                          }
+
+                          listenables.selectedCameraPreset = _presets[newIndex];
                           prefs.setString(
                             "latestPreset",
                             listenables.selectedCameraPreset!.name,
