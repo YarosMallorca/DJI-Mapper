@@ -7,7 +7,6 @@ A cross-platform tool to plan and create automatic Survey/Photogrammetry mission
 <img src="https://github.com/user-attachments/assets/7ba5ac8f-bac7-4c4c-9671-a2c3f7f0207d" height="300px" />
 <img src="https://github.com/user-attachments/assets/f94518bd-5776-42d5-9dc5-267a274b919b" height="250px" />
 
-
 </div>
 
 ## Features
@@ -20,11 +19,11 @@ A cross-platform tool to plan and create automatic Survey/Photogrammetry mission
 
 ## Supported Aircraft
 
-- **DJI Fly**: DJI Mini 4 Pro, DJI Air 3, DJI Mavic 3, Mavic 3 Cine, Mavic 3 Classic
-- **Litchi**: Mini 2, Mini SE (NOT Mini 4K), Air 2S, Mavic Mini 1, Mavic Air 2, Mavic 2 Zoom/Pro, Mavic Air 1, Mavic Pro 1, Phantom 4 (Standard/Advanced/Pro/ProV2), Phantom 3 (Standard/4K/Advanced/Professional), Inspire 1 (X3/Z3/Pro/RAW), Inspire 2 and Spark
-- **Litchi Pilot Beta**: Mini 3, Mini 3 Pro, Mavic 3E, Mavic 3T
-  
-**IMPORTANT NOTE regarding Litchi Pilot**: I haven't tested how well Litchi Pilot plays with DJI-Mapper, so I can't guarantee a smooth experience. 
+- **[DJI Fly](https://www.dji.com/downloads/djiapp/dji-fly)**: DJI Mini 4 Pro, DJI Mini 5 Pro, DJI Air 3, DJI Air 3S, DJI Mavic 3 (Regular/Cine/Classic), DJI Mavic 4 Pro
+- **[Litchi](https://flylitchi.com)**: Mini 2, Mini SE (NOT Mini 4K), Air 2S, Mavic Mini 1, Mavic Air 2, Mavic 2 Zoom/Pro, Mavic Air 1, Mavic Pro 1, Phantom 4 (Standard/Advanced/Pro/ProV2), Phantom 3 (Standard/4K/Advanced/Professional), Inspire 1 (X3/Z3/Pro/RAW), Inspire 2 and Spark
+- **[Litchi Pilot (beta)](https://forum.flylitchi.com/t/open-beta-litchi-pilot/10621)**: Mini 3, Mini 3 Pro, Mavic 3E, Mavic 3T, Matrice 4, Matrice 30, Matrice 300 & 350 RTK, Matrice 400
+
+**IMPORTANT NOTE regarding Litchi Pilot**: I haven't tested how well Litchi Pilot plays with DJI-Mapper, so I can't guarantee a smooth experience.
 
 ## Installation
 
