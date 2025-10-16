@@ -174,7 +174,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
     if (!mounted) return;
     Provider.of<MapProvider>(context, listen: false)
         .mapController
-        .move(LatLng(location.latitude, location.longitude), 14);
+        .move(LatLng(location.latitude, location.longitude), 17);
   }
 
   @override
@@ -323,7 +323,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                           });
                         },
                         onSelected: (option) =>
-                            mapProvider.mapController.move(option.location, 12),
+                            mapProvider.mapController.move(option.location, 17),
                         optionsViewBuilder: (context, onSelected, options) {
                           return Align(
                               alignment: Alignment.topLeft,
@@ -392,7 +392,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                           onFieldSubmitted: (value) async {
                             await _search(textEditingController.text);
                             mapProvider.mapController
-                                .move(_searchLocations.first.location, 12);
+                                .move(_searchLocations.first.location, 17);
                           },
                           decoration: InputDecoration(
                               hintText: 'Search location',
