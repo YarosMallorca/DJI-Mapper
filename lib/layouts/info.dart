@@ -19,9 +19,13 @@ class _InfoState extends State<Info> {
       var area = 0;
       var recommendedShutterSpeed = "0";
       if (listenables.polygon.length > 2) {
-        totalDistance = DroneMappingEngine.calculateTotalDistance(
-                listenables.flightLine?.points ?? [])
-            .round();
+        var mainDistance = DroneMappingEngine.calculateTotalDistance(
+            listenables.flightLine?.points ?? []);
+        var takeoffDistance = DroneMappingEngine.calculateTotalDistance(
+            listenables.takeoffLine?.points ?? []);
+        var returnDistance = DroneMappingEngine.calculateTotalDistance(
+            listenables.returnLine?.points ?? []);
+        totalDistance = (mainDistance + takeoffDistance + returnDistance).round();
         area = DroneMappingEngine.calculateArea(listenables.polygon).round();
         recommendedShutterSpeed =
             DroneMappingEngine.calculateRecommendedShutterSpeed(

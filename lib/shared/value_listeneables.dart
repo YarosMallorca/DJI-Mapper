@@ -147,6 +147,14 @@ class ValueListenables extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// User defined home point
+  final _homePoint = ValueNotifier<LatLng?>(null);
+  LatLng? get homePoint => _homePoint.value;
+  set homePoint(LatLng? value) {
+    _homePoint.value = value;
+    notifyListeners();
+  }
+
   /// List of photo markers
   final _photoLocations = ValueNotifier<List<LatLng>>([]);
   List<LatLng> get photoLocations => _photoLocations.value;
@@ -160,6 +168,22 @@ class ValueListenables extends ChangeNotifier {
   Polyline? get flightLine => _flightLine.value;
   set flightLine(Polyline? value) {
     _flightLine.value = value;
+    notifyListeners();
+  }
+
+  /// Takeoff line from home to first waypoint
+  final _takeoffPath = ValueNotifier<Polyline?>(null);
+  Polyline? get takeoffLine => _takeoffPath.value;
+  set takeoffLine(Polyline? value) {
+    _takeoffPath.value = value;
+    notifyListeners();
+  }
+
+  /// Return line from last waypoint to home
+  final _returnPath = ValueNotifier<Polyline?>(null);
+  Polyline? get returnLine => _returnPath.value;
+  set returnLine(Polyline? value) {
+    _returnPath.value = value;
     notifyListeners();
   }
 
