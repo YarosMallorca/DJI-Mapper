@@ -5,6 +5,7 @@ import 'package:dji_waypoint_engine/engine.dart';
 
 class AircraftSettings {
   int altitude;
+  int groundOffset;
   double speed;
   int forwardOverlap;
   int sideOverlap;
@@ -16,6 +17,7 @@ class AircraftSettings {
 
   AircraftSettings({
     required this.altitude,
+    required this.groundOffset,
     required this.speed,
     required this.forwardOverlap,
     required this.sideOverlap,
@@ -29,6 +31,7 @@ class AircraftSettings {
   Map<String, dynamic> toJson() {
     return {
       'altitude': altitude,
+      'groundOffset': groundOffset,
       'speed': speed,
       'forwardOverlap': forwardOverlap,
       'sideOverlap': sideOverlap,
@@ -43,6 +46,7 @@ class AircraftSettings {
   factory AircraftSettings.fromJson(Map<String, dynamic> json) {
     return AircraftSettings(
       altitude: json['altitude'] ?? 50,
+      groundOffset: json['groundOffset'] ?? 0,
       speed: json['speed'] ?? 4.0,
       forwardOverlap: json['forwardOverlap'] ?? 60,
       sideOverlap: json['sideOverlap'] ?? 40,
@@ -60,6 +64,7 @@ class AircraftSettings {
 
   static final _defaultSettings = AircraftSettings(
     altitude: 50,
+    groundOffset: 0,
     speed: 5,
     forwardOverlap: 60,
     sideOverlap: 40,

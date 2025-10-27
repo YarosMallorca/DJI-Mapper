@@ -28,13 +28,13 @@ class _InfoState extends State<Info> {
         totalDistance = (mainDistance + takeoffDistance + returnDistance).round();
         area = DroneMappingEngine.calculateArea(listenables.polygon).round();
         recommendedShutterSpeed =
-            DroneMappingEngine.calculateRecommendedShutterSpeed(
-          altitude: listenables.altitude,
-          sensorWidth: listenables.sensorWidth,
-          focalLength: listenables.focalLength,
-          imageWidth: listenables.imageWidth,
-          droneSpeed: listenables.speed,
-        );
+          DroneMappingEngine.calculateRecommendedShutterSpeed(
+            altitude: listenables.altitude - listenables.groundOffset,
+            sensorWidth: listenables.sensorWidth,
+            focalLength: listenables.focalLength,
+            imageWidth: listenables.imageWidth,
+            droneSpeed: listenables.speed,
+          );
       }
 
       return Column(

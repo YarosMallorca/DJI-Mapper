@@ -139,6 +139,14 @@ class ValueListenables extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Ground offset in metres (e.g., rooftop height above ground)
+  final _groundOffset = ValueNotifier<int>(0);
+  int get groundOffset => _groundOffset.value;
+  set groundOffset(int value) {
+    _groundOffset.value = value;
+    notifyListeners();
+  }
+
   /// Polygon of the area to map
   final _polygon = ValueNotifier<List<LatLng>>([]);
   List<LatLng> get polygon => _polygon.value;

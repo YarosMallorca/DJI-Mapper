@@ -30,6 +30,9 @@ class DroneMappingEngine {
   /// Angle of the drone in degrees
   final double angle;
 
+  /// Ground offset in meters (e.g., height of target surface above ground)
+  final double groundOffset;
+
   DroneMappingEngine({
     required this.altitude,
     required this.forwardOverlap,
@@ -40,10 +43,13 @@ class DroneMappingEngine {
     required this.imageWidth,
     required this.imageHeight,
     required this.angle,
+    required this.groundOffset,
   });
 
-  double get gsdX => (altitude * sensorWidth) / (imageWidth * focalLength);
-  double get gsdY => (altitude * sensorHeight) / (imageHeight * focalLength);
+  double get effectiveAltitude => altitude - groundOffset;
+
+  double get gsdX => (effectiveAltitude * sensorWidth) / (imageWidth * focalLength);
+  double get gsdY => (effectiveAltitude * sensorHeight) / (imageHeight * focalLength);
 
   double get footprintWidth => gsdX * imageWidth;
   double get footprintHeight => gsdY * imageHeight;

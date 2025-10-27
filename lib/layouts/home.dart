@@ -72,6 +72,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       listenables.cameraAngle = aircraftSettings.cameraAngle;
       listenables.onFinished = aircraftSettings.finishAction;
       listenables.rcLostAction = aircraftSettings.rcLostAction;
+      listenables.groundOffset = aircraftSettings.groundOffset;
     });
 
     var cameraPresets = PresetManager.getPresets();
@@ -198,6 +199,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       imageWidth: listenables.imageWidth,
       imageHeight: listenables.imageHeight,
       angle: listenables.rotation.toDouble(),
+      groundOffset: listenables.groundOffset.toDouble(),
     );
 
     var waypoints = droneMapping.generateWaypoints(listenables.polygon, listenables.createCameraPoints, listenables.fillGrid, listenables.homePoint);
@@ -213,10 +215,6 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
         height: 40,  // Increased height to fit number
         alignment: Alignment.center,
         rotate: false,
-        child: Container(
-          decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withAlpha(179),
-              borderRadius: BorderRadius.circular(10)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -238,7 +236,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
               ),
             ],
           ),
-        )));
+        ));
     }
     listenables.flightLine = Polyline(
       points: waypoints,
