@@ -13,6 +13,14 @@ class ValueListenables extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Ground offset in metres (e.g., rooftop height above ground)
+  final _groundOffset = ValueNotifier<int>(0);
+  int get groundOffset => _groundOffset.value;
+  set groundOffset(int value) {
+    _groundOffset.value = value;
+    notifyListeners();
+  }
+
   /// Forward overlap in percentage
   final _forwardOverlap = ValueNotifier<int>(60);
   int get forwardOverlap => _forwardOverlap.value;
@@ -136,14 +144,6 @@ class ValueListenables extends ChangeNotifier {
   RCLostAction get rcLostAction => _rcLostAction.value;
   set rcLostAction(RCLostAction value) {
     _rcLostAction.value = value;
-    notifyListeners();
-  }
-
-  /// Ground offset in metres (e.g., rooftop height above ground)
-  final _groundOffset = ValueNotifier<int>(0);
-  int get groundOffset => _groundOffset.value;
-  set groundOffset(int value) {
-    _groundOffset.value = value;
     notifyListeners();
   }
 

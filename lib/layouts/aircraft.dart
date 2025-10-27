@@ -43,7 +43,7 @@ class _AircraftBarState extends State<AircraftBar> {
                   children: [
                     CustomTextField(
                         labelText: "Altitude (m)",
-                        min: 10,
+                        min: listenables.groundOffset < 10?10:listenables.groundOffset + 1,
                         max: 500,
                         onChanged: (m) {
                           listenables.altitude = m.round();
@@ -53,7 +53,7 @@ class _AircraftBarState extends State<AircraftBar> {
                     CustomTextField(
                         labelText: "Ground offset (m)",
                         min: 0,
-                        max: 500,
+                        max: listenables.altitude - 1,
                         onChanged: (m) {
                           listenables.groundOffset = m.round();
                           _updateSettings(listenables);
