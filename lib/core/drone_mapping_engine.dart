@@ -160,104 +160,107 @@ class DroneMappingEngine {
     num minY = rotatedPolygon.map((p) => p.y).reduce(min);
     num maxY = rotatedPolygon.map((p) => p.y).reduce(max);
 
-  if (homePoint == null) {
-    List<Point> waypoints = [];
-    bool reverse = false;
+    if (homePoint == null) {
+      List<Point> waypoints = [];
+      bool reverse = false;
 
-    for (num y = minY; y <= maxY; y += horizontalLineSpacing) {
-      List<Point> line = [];
-      if (createCameraPoints) {
-        for (num x = minX; x <= maxX; x += horizontalWaypointSpacing) {
-          Point p = Point(x, y);
-          if (_isPointInPolygon(p, rotatedPolygon)) {
-            line.add(p);
+      for (num y = minY; y <= maxY; y += horizontalLineSpacing) {
+        List<Point> line = [];
+        if (createCameraPoints) {
+          for (num x = minX; x <= maxX; x += horizontalWaypointSpacing) {
+            Point p = Point(x, y);
+            if (_isPointInPolygon(p, rotatedPolygon)) {
+              line.add(p);
+            }
           }
-        }
-        if (line.isNotEmpty) {
-          Point lastInLine = line.last;
-          if ((maxX - lastInLine.x).abs() > 1e-6) {
-            Point candidate = Point(maxX, y);
-            if (_isPointInPolygon(candidate, rotatedPolygon)) {
-              line.add(candidate);
+          if (line.isNotEmpty) {
+            Point lastInLine = line.last;
+            if ((maxX - lastInLine.x).abs() > 1e-6) {
+              Point candidate = Point(maxX, y);
+              if (_isPointInPolygon(candidate, rotatedPolygon)) {
+                line.add(candidate);
+              }
+            }
+          }
+        } else {
+          Point? firstPoint;
+          Point? lastPoint;
+          for (num x = minX; x <= maxX; x += horizontalWaypointSpacing) {
+            Point p = Point(x, y);
+            if (_isPointInPolygon(p, rotatedPolygon)) {
+              firstPoint ??= p;
+              lastPoint = p;
+            }
+          }
+          if (firstPoint != null) {
+            if (lastPoint != null && (maxX - lastPoint.x).abs() > 1e-6) {
+              Point candidate = Point(maxX, y);
+              if (_isPointInPolygon(candidate, rotatedPolygon)) {
+                lastPoint = candidate;
+              }
+            }
+            line.add(firstPoint);
+            if (lastPoint != null && lastPoint != firstPoint) {
+              line.add(lastPoint);
             }
           }
         }
-      } else {
-        Point? firstPoint;
-        Point? lastPoint;
-        for (num x = minX; x <= maxX; x += horizontalWaypointSpacing) {
-          Point p = Point(x, y);
-          if (_isPointInPolygon(p, rotatedPolygon)) {
-            firstPoint ??= p;
-            lastPoint = p;
-          }
+        if (reverse) {
+          line = line.reversed.toList();
         }
-        if (firstPoint != null) {
-          if (lastPoint != null && (maxX - lastPoint.x).abs() > 1e-6) {
-            Point candidate = Point(maxX, y);
-            if (_isPointInPolygon(candidate, rotatedPolygon)) {
-              lastPoint = candidate;
-            }
-          }
-          line.add(firstPoint);
-          if (lastPoint != null && lastPoint != firstPoint) {
-            line.add(lastPoint);
-          }
-        }
+        waypoints.addAll(line);
+        reverse = !reverse;
       }
-      if (reverse) {
-        line = line.reversed.toList();
+
+      if (fillGrid) {
+        var lastHorizontal = waypoints.last;
+        var verticalWaypoints = _generateVerticalWaypoints(rotatedPolygon, createCameraPoints, lastHorizontal, minX, maxX, minY, maxY);
+        waypoints.addAll(verticalWaypoints);
       }
-      waypoints.addAll(line);
-      reverse = !reverse;
-    }
 
-    if (fillGrid) {
-      var lastHorizontal = waypoints.last;
-      var verticalWaypoints = _generateVerticalWaypoints(rotatedPolygon, createCameraPoints, lastHorizontal, minX, maxX, minY, maxY);
-      waypoints.addAll(verticalWaypoints);
-    }
-
-    var rotatedWaypointsBack = _rotatePolygon(waypoints, -angle);
-    return _metersToLatLng(rotatedWaypointsBack, origin);
-  } else {
-    Point homeP = _latLngToPoint(homePoint, origin);
-    List<Point> selected;
-
-    if (!fillGrid) {
-      var horiz = _generateHorizontalWaypoints(rotatedPolygon, createCameraPoints, homeP, minX, maxX, minY, maxY);
-      var horizRev = horiz.reversed.toList();
-      double distHoriz = _distance(horiz.last, homeP);
-      double distHorizRev = _distance(horizRev.last, homeP);
-      selected = distHoriz < distHorizRev ? horiz : horizRev;
+      var rotatedWaypointsBack = _rotatePolygon(waypoints, -angle);
+      return _metersToLatLng(rotatedWaypointsBack, origin);
     } else {
-      // Horizontal first
-      var horiz = _generateHorizontalWaypoints(rotatedPolygon, createCameraPoints, homeP, minX, maxX, minY, maxY);
-      var vert = _generateVerticalWaypoints(rotatedPolygon, createCameraPoints, horiz.last, minX, maxX, minY, maxY);
-      var pathHF = [...horiz, ...vert];
-      var pathHFRev = pathHF.reversed.toList();
+      Point homeP = _latLngToPoint(homePoint, origin);
+      List<Point> selected;
 
-      // Vertical first
-      var vertF = _generateVerticalWaypoints(rotatedPolygon, createCameraPoints, homeP, minX, maxX, minY, maxY);
-      var horizA = _generateHorizontalWaypoints(rotatedPolygon, createCameraPoints, vertF.last, minX, maxX, minY, maxY);
-      var pathVF = [...vertF, ...horizA];
-      var pathVFRev = pathVF.reversed.toList();
-
-      var paths = [pathHF, pathHFRev, pathVF, pathVFRev];
-      var best = paths[0];
-      var bestDist = _distance(best.last, homeP);
-      for (var p in paths.skip(1)) {
-        var d = _distance(p.last, homeP);
-        if (d < bestDist) {
-          bestDist = d;
-          best = p;
+      if (!fillGrid) {
+        var horiz = _generateHorizontalWaypoints(rotatedPolygon, createCameraPoints, homeP, minX, maxX, minY, maxY);
+        if(horiz.isEmpty) {
+          return [];
         }
-      }
-      selected = best;
-    }
+        var horizRev = horiz.reversed.toList();
+        double distHoriz = _distance(horiz.last, homeP);
+        double distHorizRev = _distance(horizRev.last, homeP);
+        selected = distHoriz < distHorizRev ? horiz : horizRev;
+      } else {
+        // Horizontal first
+        var horiz = _generateHorizontalWaypoints(rotatedPolygon, createCameraPoints, homeP, minX, maxX, minY, maxY);
+        var vert = _generateVerticalWaypoints(rotatedPolygon, createCameraPoints, horiz.last, minX, maxX, minY, maxY);
+        var pathHF = [...horiz, ...vert];
+        var pathHFRev = pathHF.reversed.toList();
 
-    var rotatedWaypointsBack = _rotatePolygon(selected, -angle);
-    return _metersToLatLng(rotatedWaypointsBack, origin);
+        // Vertical first
+        var vertF = _generateVerticalWaypoints(rotatedPolygon, createCameraPoints, homeP, minX, maxX, minY, maxY);
+        var horizA = _generateHorizontalWaypoints(rotatedPolygon, createCameraPoints, vertF.last, minX, maxX, minY, maxY);
+        var pathVF = [...vertF, ...horizA];
+        var pathVFRev = pathVF.reversed.toList();
+
+        var paths = [pathHF, pathHFRev, pathVF, pathVFRev];
+        var best = paths[0];
+        var bestDist = _distance(best.last, homeP);
+        for (var p in paths.skip(1)) {
+          var d = _distance(p.last, homeP);
+          if (d < bestDist) {
+            bestDist = d;
+            best = p;
+          }
+        }
+        selected = best;
+      }
+
+      var rotatedWaypointsBack = _rotatePolygon(selected, -angle);
+      return _metersToLatLng(rotatedWaypointsBack, origin);
     }
   }
 

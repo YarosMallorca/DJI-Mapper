@@ -285,7 +285,6 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       _placeArrowMarkers(home, first, arrowSpacing, distance, 0.0, _takeoffLineArrowMarkers, Theme.of(context).colorScheme.primary, 10);
       _placeArrowMarkers(last, home, arrowSpacing, distance, 0.0, _returnLineArrowMarkers, Theme.of(context).colorScheme.primary, 10);
     } else {
-      listenables.homePoint = null;
       listenables.takeoffLine = null;
       listenables.returnLine = null;
       _flightLineArrowMarkers.clear();
