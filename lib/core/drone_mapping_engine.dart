@@ -455,6 +455,24 @@ class DroneMappingEngine {
     return '1/${(1 / closest).toInt()}';
   }
 
+  // if photo points aren't being generated then the operator will need to know
+  // the photo time interval for the timelapse/hyperlapse forward overlap
+  static double calculatePhotoTimeInterval({
+    required int altitude,
+    required double sensorHeight,
+    required double focalLength,
+    required int imageHeight,
+    required double forwardOverlap,
+    required double droneSpeed,
+    int groundOffset = 0,
+  }) {
+    double effectiveAltitude = altitude - groundOffset.toDouble();
+    double gsdY = (effectiveAltitude * sensorHeight) / (imageHeight * focalLength);
+    double footprintHeight = gsdY * imageHeight;
+    double spacing = footprintHeight * (1 - forwardOverlap);
+    return spacing / droneSpeed;
+  }
+
   static double _haversineDistance(LatLng p1, LatLng p2) {
     const R = 6371e3; // Earth radius in meters
     final phi1 = p1.latitudeInRad;
