@@ -126,12 +126,6 @@ class DroneMappingEngine {
     return Point(x, y);
   }
 
-  static LatLng _pointToLatLng(Point point, LatLng origin) {
-    double lat = origin.latitude + (point.y / (40075000 / 360));
-    double lng = origin.longitude + (point.x / (40075000 * cos((origin.latitude * pi) / 180) / 360));
-    return LatLng(lat, lng);
-  }
-
   static double _distance(Point a, Point b) {
     return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
   }
@@ -150,7 +144,7 @@ class DroneMappingEngine {
   }
 
   // Generate waypoints within the polygon in a boustrophedon pattern
-  List<LatLng> generateWaypoints(List<LatLng> polygon, bool createCameraPoints, [bool fillGrid = false, LatLng? homePoint = null]) {
+  List<LatLng> generateWaypoints(List<LatLng> polygon, bool createCameraPoints, [bool fillGrid = false, LatLng? homePoint]) {
     var localPolygon = _latLngToMeters(polygon);
     var rotatedPolygon = _rotatePolygon(localPolygon, angle);
     var origin = polygon[0];
