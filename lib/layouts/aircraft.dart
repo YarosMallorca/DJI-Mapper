@@ -16,6 +16,7 @@ class _AircraftBarState extends State<AircraftBar> {
   void _updateSettings(ValueListenables listenables) {
     AircraftSettings.saveAircraftSettings(AircraftSettings(
       altitude: listenables.altitude,
+      groundOffset: listenables.groundOffset,
       speed: listenables.speed,
       forwardOverlap: listenables.forwardOverlap,
       sideOverlap: listenables.sideOverlap,
@@ -42,13 +43,22 @@ class _AircraftBarState extends State<AircraftBar> {
                   children: [
                     CustomTextField(
                         labelText: "Altitude (m)",
-                        min: 10,
+                        min: listenables.groundOffset < 10?10:listenables.groundOffset + 1,
                         max: 500,
                         onChanged: (m) {
                           listenables.altitude = m.round();
                           _updateSettings(listenables);
                         },
                         defaultValue: listenables.altitude),
+                    CustomTextField(
+                        labelText: "Ground offset (m)",
+                        min: 0,
+                        max: listenables.altitude - 1,
+                        onChanged: (m) {
+                          listenables.groundOffset = m.round();
+                          _updateSettings(listenables);
+                        },
+                        defaultValue: listenables.groundOffset),
                     CustomTextField(
                         labelText: "Speed (m/s)",
                         min: 0.1,

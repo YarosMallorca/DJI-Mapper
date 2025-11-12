@@ -18,19 +18,34 @@ class _InfoState extends State<Info> {
       var totalDistance = 0;
       var area = 0;
       var recommendedShutterSpeed = "0";
+      var photoTimeInterval = 0.0;
+
       if (listenables.polygon.length > 2) {
-        totalDistance = DroneMappingEngine.calculateTotalDistance(
-                listenables.flightLine?.points ?? [])
-            .round();
+        var mainDistance = DroneMappingEngine.calculateTotalDistance(
+            listenables.flightLine?.points ?? []);
+        var takeoffDistance = DroneMappingEngine.calculateTotalDistance(
+            listenables.takeoffLine?.points ?? []);
+        var returnDistance = DroneMappingEngine.calculateTotalDistance(
+            listenables.returnLine?.points ?? []);
+        totalDistance = (mainDistance + takeoffDistance + returnDistance).round();
         area = DroneMappingEngine.calculateArea(listenables.polygon).round();
         recommendedShutterSpeed =
-            DroneMappingEngine.calculateRecommendedShutterSpeed(
-          altitude: listenables.altitude,
-          sensorWidth: listenables.sensorWidth,
-          focalLength: listenables.focalLength,
-          imageWidth: listenables.imageWidth,
-          droneSpeed: listenables.speed,
-        );
+          DroneMappingEngine.calculateRecommendedShutterSpeed(
+            altitude: listenables.altitude - listenables.groundOffset,
+            sensorWidth: listenables.sensorWidth,
+            focalLength: listenables.focalLength,
+            imageWidth: listenables.imageWidth,
+            droneSpeed: listenables.speed,
+          );
+          photoTimeInterval = DroneMappingEngine.calculatePhotoTimeInterval(
+            altitude: listenables.altitude,
+            sensorHeight: listenables.sensorHeight,
+            focalLength: listenables.focalLength,
+            imageHeight: listenables.imageHeight,
+            forwardOverlap: listenables.forwardOverlap / 100.0,
+            droneSpeed: listenables.speed,
+            groundOffset: listenables.groundOffset,
+          );          
       }
 
       return Column(
@@ -83,6 +98,10 @@ class _InfoState extends State<Info> {
               Text(
                   "Recommended shutter speed: $recommendedShutterSpeed or faster",
                   style: const TextStyle(fontSize: 16)),
+              const Divider(),
+              Text(
+                  "Forward Overlap time interval: ${photoTimeInterval.toStringAsFixed(1)} seconds",
+                  style: const TextStyle(fontSize: 16)),                  
             ]),
           ))
         ],

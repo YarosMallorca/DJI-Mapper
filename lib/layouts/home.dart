@@ -45,6 +45,10 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
   Timer? _debounceTimer;
   List<MapSearchLocation> _searchLocations = [];
 
+  final List<Marker> _flightLineArrowMarkers = [];
+  final List<Marker> _takeoffLineArrowMarkers = [];
+  final List<Marker> _returnLineArrowMarkers = [];
+
   @override
   void initState() {
     super.initState();
@@ -68,6 +72,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       listenables.cameraAngle = aircraftSettings.cameraAngle;
       listenables.onFinished = aircraftSettings.finishAction;
       listenables.rcLostAction = aircraftSettings.rcLostAction;
+      listenables.groundOffset = aircraftSettings.groundOffset;
     });
 
     var cameraPresets = PresetManager.getPresets();
@@ -194,42 +199,136 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       imageWidth: listenables.imageWidth,
       imageHeight: listenables.imageHeight,
       angle: listenables.rotation.toDouble(),
+      groundOffset: listenables.groundOffset.toDouble(),
     );
 
-    var waypoints = droneMapping.generateWaypoints(listenables.polygon,
-        listenables.createCameraPoints, listenables.fillGrid);
+    var waypoints = droneMapping.generateWaypoints(listenables.polygon, listenables.createCameraPoints, listenables.fillGrid, listenables.homePoint);
     listenables.photoLocations = waypoints;
     if (waypoints.isEmpty) return;
+
     _photoMarkers.clear();
-    for (var photoLocation in waypoints) {
+
+    for (int i = 0; i < waypoints.length; i++) {
+      var photoLocation = waypoints[i];
       _photoMarkers.add(Marker(
-          point: photoLocation,
-          height: 25,
-          alignment: Alignment.center,
-          rotate: false,
-          child: Container(
-            decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withAlpha(179),
-                borderRadius: BorderRadius.circular(10)),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (listenables.createCameraPoints)
-                  Icon(Icons.photo_camera,
-                      size: 25,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer)
-                else
-                  Icon(Icons.place_sharp,
-                      size: 25,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer)
-              ],
-            ),
-          )));
+        point: photoLocation,
+        height: 40,  // Increased height to fit number
+        alignment: Alignment.center,
+        rotate: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (listenables.createCameraPoints)
+                Icon(Icons.photo_camera,
+                    size: 20,  // Reduced size for better fit
+                    color: Theme.of(context).colorScheme.onPrimaryContainer)
+              else
+                Icon(Icons.place_sharp,
+                    size: 20,  // Reduced size for better fit
+                    color: Theme.of(context).colorScheme.onPrimaryContainer),
+
+              Text(  // Waypoint number text
+                "${i + 1}",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          ),
+        ));
     }
     listenables.flightLine = Polyline(
-        points: waypoints,
-        strokeWidth: 3,
-        color: Theme.of(context).colorScheme.tertiary);
+      points: waypoints,
+      strokeWidth: 3,
+      color: Theme.of(context).colorScheme.tertiary
+    );
+
+    // Draw directional arrow markers
+    _flightLineArrowMarkers.clear();
+    _takeoffLineArrowMarkers.clear();
+    _returnLineArrowMarkers.clear();
+
+    if (waypoints.length > 1 && listenables.homePoint != null) {
+      const double arrowSpacing = 40.0; // Metres between arrows
+      LatLng lastPoint = waypoints[0];
+      const distance = Distance();
+      double cumulativeDistance = 0.0;
+
+      for (int i = 1; i < waypoints.length; i++) {
+        cumulativeDistance = _placeArrowMarkers(lastPoint, waypoints[i], arrowSpacing, distance, cumulativeDistance, _flightLineArrowMarkers, Theme.of(context).colorScheme.tertiary, 15);
+        lastPoint = waypoints[i];
+      }
+
+      // Add dashed takeoff line from home to first waypoint to designate 'Start'
+      final home = listenables.homePoint!;
+      final first = waypoints.first;
+      final last = waypoints.last;
+      //final bearing = distance.bearing(home, first);
+      //final offsetDistance = 2.0; // metres offset from home
+      //final offsetPoint = distance.offset(home, offsetDistance, bearing);
+
+      listenables.takeoffLine = Polyline(
+        points: [home, first],
+        strokeWidth: 1,
+        color: Theme.of(context).colorScheme.primary,
+        pattern: StrokePattern.dotted(), 
+      );
+
+      listenables.returnLine = Polyline(
+        points: [home, last],
+        strokeWidth: 1,
+        color: Theme.of(context).colorScheme.primary,
+        pattern: StrokePattern.dotted(), 
+      );
+
+      _placeArrowMarkers(home, first, arrowSpacing, distance, 0.0, _takeoffLineArrowMarkers, Theme.of(context).colorScheme.primary, 10);
+      _placeArrowMarkers(last, home, arrowSpacing, distance, 0.0, _returnLineArrowMarkers, Theme.of(context).colorScheme.primary, 10);
+    } else {
+      listenables.takeoffLine = null;
+      listenables.returnLine = null;
+      _flightLineArrowMarkers.clear();
+      _takeoffLineArrowMarkers.clear();
+      _returnLineArrowMarkers.clear();
+    }
+  }
+
+  // Add directional arrows along a given segment of fromPoint to toPoint facing the arrows to the toPoint
+  double _placeArrowMarkers(LatLng fromPoint, LatLng toPoint, double arrowSpacing, var distance, double cumulativeDistance, List<Marker> targetArrowMarkers, Color arrowColour, double arrowSize) {
+    double segmentDistance = distance.as(LengthUnit.Meter, fromPoint, toPoint);
+    double distAlong = arrowSpacing - (cumulativeDistance % arrowSpacing);
+
+    while (distAlong < segmentDistance) {
+      double fraction = distAlong / segmentDistance;
+      double bearing = distance.bearing(fromPoint, toPoint);
+
+      // Interpolate position along the segment
+      LatLng arrowPos = LatLng(
+        fromPoint.latitude + fraction * (toPoint.latitude - fromPoint.latitude),
+        fromPoint.longitude + fraction * (toPoint.longitude - fromPoint.longitude),
+      );
+
+      targetArrowMarkers.add(Marker(
+        point: arrowPos,
+        width: arrowSize + 5,
+        height: arrowSize + 5,
+        alignment: Alignment.center,
+        child: Transform.rotate(
+          angle: ((bearing - 90) * pi / 180),
+          child: Icon(
+            Icons.arrow_forward,
+            size: arrowSize,
+            color: arrowColour,
+          ),
+        ),
+      ));
+
+      distAlong += arrowSpacing;
+    }
+
+    cumulativeDistance += segmentDistance;
+
+    return cumulativeDistance;
   }
 
   @override
@@ -243,6 +342,11 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
             listenables.photoLocations.clear();
             _photoMarkers.clear();
             listenables.flightLine = null;
+            listenables.takeoffLine = null;
+            listenables.returnLine = null;
+            _takeoffLineArrowMarkers.clear();
+            _returnLineArrowMarkers.clear();
+            _flightLineArrowMarkers.clear();
           }
         });
 
@@ -252,11 +356,18 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
             child: FlutterMap(
               mapController: mapProvider.mapController,
               options: MapOptions(
-                onTap: (tapPosition, point) => {
-                  setState(() {
+                onTap: (tapPosition, point) => setState(() {
+                  if (listenables.homePoint == null) {
+                    listenables.homePoint = point;
+                  } else {
                     listenables.polygon.add(point);
-                  }),
-                },
+                  }
+                }),
+                onSecondaryTap: (tapPosition, point) {
+                  setState(() {
+                    listenables.homePoint = point;
+                  });
+                }
               ),
               children: [
                 TileLayer(
@@ -271,7 +382,9 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                         ? 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
                         : 'https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
                     userAgentPackageName: 'com.yarosfpv.dji_mapper',
-                    subdomains: const ['mt0', 'mt1', 'mt2', 'mt3']),
+                    subdomains: const ['mt0', 'mt1', 'mt2', 'mt3']
+                  ),
+                // flight path boundary
                 PolygonLayer(polygons: [
                   if (listenables.polygon.length > 1)
                     Polygon(
@@ -281,33 +394,81 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                         borderColor: Theme.of(context).colorScheme.primary,
                         borderStrokeWidth: 3),
                 ]),
-                PolylineLayer(polylines: [
-                  if (listenables.flightLine != null)
-                    listenables.flightLine ?? Polyline(points: [])
-                ]),
-                if (listenables.showPoints) MarkerLayer(markers: _photoMarkers),
-                DragMarkers(markers: [
-                  for (var point in listenables.polygon)
-                    DragMarker(
-                      size: const Size(30, 30),
-                      point: point,
-                      alignment: Alignment.topCenter,
-                      builder: (_, coords, b) => GestureDetector(
-                          onSecondaryTap: () => setState(() {
-                                if (listenables.polygon.contains(point)) {
-                                  listenables.polygon.remove(point);
-                                }
-                              }),
-                          child: const Icon(Icons.place, size: 30)),
-                      onDragUpdate: (details, latLng) => {
-                        if (listenables.polygon.contains(point))
-                          {
-                            listenables.polygon[
+                // flightLine, takeoffLine & returnLine
+                if (listenables.homePoint != null) 
+                  PolylineLayer(
+                    polylines: [
+                      if (listenables.flightLine != null) listenables.flightLine!,
+                      if (listenables.takeoffLine != null) listenables.takeoffLine!,  // dotted start line from home
+                      if (listenables.returnLine != null) listenables.returnLine!,  // dotted return line to home
+                    ],
+                  ),
+                // directional flight path arrows
+                MarkerLayer(markers: _flightLineArrowMarkers),
+                MarkerLayer(markers: _takeoffLineArrowMarkers),
+                MarkerLayer(markers: _returnLineArrowMarkers),
+                // photo markers
+                if (listenables.showPoints)
+                  MarkerLayer(markers: _photoMarkers),
+                  DragMarkers(markers: [
+                    for (var point in listenables.polygon)
+                      DragMarker(
+                        size: const Size(30, 30),
+                        point: point,
+                        alignment: Alignment.topCenter,
+                        builder: (_, coords, b) => GestureDetector(
+                            onSecondaryTap: () => setState(() {
+                                  if (listenables.polygon.contains(point)) {
+                                    listenables.polygon.remove(point);
+                                  }
+                                }),
+                            child: const Icon(Icons.place, size: 30)),
+                        onDragUpdate: (details, latLng) => {
+                          if (listenables.polygon.contains(point))
+                            {
+                              listenables.polygon[
                                 listenables.polygon.indexOf(point)] = latLng
-                          }
-                      },
-                    ),
-                ]),
+                            }
+                        },
+                      ),
+                  ]),
+                // home point icon
+                if (listenables.homePoint != null) 
+                  DragMarkers(
+                    // home marker
+                    markers: [
+                      DragMarker(
+                        point: listenables.homePoint!,
+                        size: const Size(50, 50),
+                        offset: const Offset(0.0, -8.0),
+                        onDragUpdate: (details, latLng) {
+                          listenables.homePoint = latLng;
+                        },
+                        builder: (context, coords, isDragging) => GestureDetector(
+                          onSecondaryTap: () {
+                            if (listenables.polygon.isEmpty) {
+                              listenables.homePoint = null;
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Cannot delete home point while boundary markers exist. Remove all boundary markers first.")),
+                              );
+                            }
+                          },
+                          child: Container(
+                            width: 50,
+                            height: 50,
+                            color: Colors.transparent,
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.home,
+                              size: 30,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),  
                 Align(
                   alignment: Alignment.topLeft,
                   child: Padding(
@@ -441,6 +602,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                               ),
                             )),
                       ),
+                      // Clear button
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Material(
@@ -451,6 +613,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
                               onTap: () => setState(() {
                                     listenables.polygon.clear();
                                     _photoMarkers.clear();
+                                    listenables.homePoint = null;
                                   }),
                               child: Padding(
                                 padding: const EdgeInsets.all(12),
