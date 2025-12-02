@@ -34,7 +34,7 @@ dependencies:
   dio: ^5.9.0
   package_info_plus: ^8.3.1
   geoxml: ^2.6.2
-  universal_io: ^2.2.2
+  universal_io: ^2.3.1
 
 dependency_overrides:
   geolocator_android: 4.5.4
