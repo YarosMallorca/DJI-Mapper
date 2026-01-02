@@ -23,7 +23,7 @@ dependencies:
   litchi_waypoint_engine:
     path: ./packages/litchi_waypoint_engine
   flutter_map_dragmarker: ^8.0.3
-  shared_preferences: ^2.5.3
+  shared_preferences: ^2.5.4
   flutter_map_cancellable_tile_provider: ^3.1.1
   archive: ^3.6.1
   file_picker: ^10.3.8
