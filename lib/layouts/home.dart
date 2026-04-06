@@ -135,27 +135,39 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
   }
 
   Future<void> _search(String query) async {
-    var response = await Dio().get(
-      "https://nominatim.openstreetmap.org/search",
-      queryParameters: {
-        "q": query,
-        "format": "jsonv2",
-      },
-    );
+    try {
+      var response = await Dio().get(
+        "https://nominatim.openstreetmap.org/search",
+        queryParameters: {
+          "q": query,
+          "format": "jsonv2",
+        },
+        options: Options(
+          headers: {
+            "User-Agent": "DJI-Mapper/1.5.0 (https://github.com/YarosMallorca/DJI-Mapper)",
+          },
+        ),
+      );
 
-    List<MapSearchLocation> locations = [];
-    for (var location in response.data) {
-      locations.add(MapSearchLocation(
-        name: location["display_name"],
-        type: location["type"],
-        location: LatLng(
-            double.parse(location["lat"]), double.parse(location["lon"])),
-      ));
+      List<MapSearchLocation> locations = [];
+      for (var location in response.data) {
+        locations.add(MapSearchLocation(
+          name: location["display_name"],
+          type: location["type"],
+          location: LatLng(
+              double.parse(location["lat"]), double.parse(location["lon"])),
+        ));
+      }
+
+      setState(() {
+        _searchLocations = locations;
+      });
+    } catch (e) {
+      // Silently fail on search errors - network issues or API rate limits
+      setState(() {
+        _searchLocations = [];
+      });
     }
-
-    setState(() {
-      _searchLocations = locations;
-    });
   }
 
   void _onSearchChanged(
@@ -169,17 +181,22 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
   }
 
   void _getLocationAndMoveMap() async {
-    if (await Geolocator.isLocationServiceEnabled() == false) return;
-    if (await Geolocator.checkPermission() == LocationPermission.denied) {
-      await Geolocator.requestPermission();
+    try {
+      if (await Geolocator.isLocationServiceEnabled() == false) return;
+      if (await Geolocator.checkPermission() == LocationPermission.denied) {
+        await Geolocator.requestPermission();
+      }
+      final location = await Geolocator.getCurrentPosition(
+          locationSettings:
+              const LocationSettings(accuracy: LocationAccuracy.low));
+      if (!mounted) return;
+      Provider.of<MapProvider>(context, listen: false)
+          .mapController
+          .move(LatLng(location.latitude, location.longitude), 17);
+    } catch (e) {
+      // Location services not available (e.g., in WSL or without GeoClue2)
+      // Silently ignore - location is an optional feature
     }
-    final location = await Geolocator.getCurrentPosition(
-        locationSettings:
-            const LocationSettings(accuracy: LocationAccuracy.low));
-    if (!mounted) return;
-    Provider.of<MapProvider>(context, listen: false)
-        .mapController
-        .move(LatLng(location.latitude, location.longitude), 17);
   }
 
   @override
