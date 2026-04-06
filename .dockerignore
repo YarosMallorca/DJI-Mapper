@@ -1,0 +1,15 @@
+.git
+.gitignore
+.github
+build/linux
+build/windows
+build/macos
+build/android
+build ios
+.dart_tool
+.metadata
+.packages
+pubspec.lock
+CLAUDE.md
+*.md
+!README.md

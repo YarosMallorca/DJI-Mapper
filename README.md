@@ -62,3 +62,30 @@ Contributions are most welcome! If you have any ideas, suggestions, or issues, p
 4. Run `flutter build <platform> --release` to build the release version.
 
 - Recommend using VSCode with the Flutter extension for development, it will allow Hot-Reload and other features.
+
+## Docker (Web)
+
+Build and run using Docker:
+
+```bash
+# Build the web app first
+flutter build web --release
+
+# Build the Docker image
+docker build -t dji-mapper:latest .
+
+# Run with Docker
+docker run -d -p 8090:80 --name dji-mapper dji-mapper:latest
+```
+
+Or use Docker Compose:
+
+```bash
+# Build and run
+docker-compose up -d
+
+# Stop
+docker-compose down
+```
+
+Access at http://localhost:8090

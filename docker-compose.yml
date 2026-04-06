@@ -1,0 +1,9 @@
+services:
+  dji-mapper:
+    image: dji-mapper:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8090:80"
+    restart: unless-stopped
