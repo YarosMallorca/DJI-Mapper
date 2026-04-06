@@ -1,15 +1,41 @@
+# Git files
 .git
 .gitignore
 .github
-build/linux
-build/windows
-build/macos
-build/android
-build ios
+
+# Build directories (we build inside Docker)
+build
 .dart_tool
 .metadata
 .packages
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Flutter/Dart files
 pubspec.lock
-CLAUDE.md
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Documentation
 *.md
 !README.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test
+coverage
+
+# Firebase
+firebase.json
+.firebaserc
+
+# Production docker-compose is kept
+!docker-compose.prod.yml

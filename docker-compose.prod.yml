@@ -1,0 +1,25 @@
+# Production Docker Compose configuration for dji.sartrainer.org
+services:
+  dji-mapper:
+    image: dji-mapper:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8090:80"
+    restart: unless-stopped
+    # Optional: Add resource limits for production
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    # Optional: Custom logging driver
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

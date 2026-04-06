@@ -65,27 +65,93 @@ Contributions are most welcome! If you have any ideas, suggestions, or issues, p
 
 ## Docker (Web)
 
-Build and run using Docker:
+Build and run using Docker (multi-stage build - no Flutter required):
 
 ```bash
-# Build the web app first
-flutter build web --release
+# Build and run with Docker Compose
+docker-compose up -d --build
 
-# Build the Docker image
+# Or build manually with Docker
 docker build -t dji-mapper:latest .
-
-# Run with Docker
 docker run -d -p 8090:80 --name dji-mapper dji-mapper:latest
 ```
 
-Or use Docker Compose:
+Stop with:
 
 ```bash
-# Build and run
-docker-compose up -d
-
-# Stop
 docker-compose down
 ```
 
 Access at http://localhost:8090
+
+**Production deployment** (dji.sartrainer.org):
+```bash
+# Use production docker-compose (container listens on port 8090)
+docker-compose -f docker-compose.prod.yml up -d --build
+```
+
+**Caddy configuration** (running on host):
+```
+dji.sartrainer.org {
+    reverse_proxy localhost:8090
+}
+```
+
+**Note**: First build takes 5-10 minutes (downloads Flutter SDK). Subsequent builds are faster with layer caching.
+
+### Production Deployment Steps
+
+**1. Build the Docker image locally:**
+```bash
+docker build -t dji-mapper:latest .
+```
+
+**2. Transfer the image to the production server:**
+```bash
+# Option A: Save and transfer via SCP
+docker save dji-mapper:latest | gzip > dji-mapper.tar.gz
+scp dji-mapper.tar.gz user@your-server:/path/to/deploy/
+
+# Option B: Push to a registry (Docker Hub, GitHub, etc.)
+docker tag dji-mapper:latest your-registry/dji-mapper:latest
+docker push your-registry/dji-mapper:latest
+```
+
+**3. On the production server, load and run:**
+```bash
+# If using image transfer
+gunzip < dji-mapper.tar.gz | docker load
+
+# If using registry
+docker pull your-registry/dji-mapper:latest
+
+# Copy docker-compose.prod.yml to server, then start
+docker-compose -f docker-compose.prod.yml up -d
+
+# Verify it's running
+docker ps
+docker logs -f dji-mapper
+```
+
+**4. Configure Caddy reverse proxy:**
+```bash
+# Edit Caddyfile
+sudo nano /etc/caddy/Caddyfile
+
+# Add this block:
+dji.sartrainer.org {
+    reverse_proxy localhost:8090
+}
+
+# Restart Caddy
+sudo systemctl reload caddy
+```
+
+**5. Verify deployment:**
+```bash
+# Check container health
+curl http://localhost:8090
+
+# Check from external
+curl https://dji.sartrainer.org
+```
