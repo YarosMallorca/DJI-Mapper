@@ -3,8 +3,13 @@
 .gitignore
 .github
 
-# Build directories (we build inside Docker)
-build
+# Build directories (keep build/web for local builds)
+!build/web
+build/linux
+build/windows
+build/macos
+build/android
+build/ios
 .dart_tool
 .metadata
 .packages
