@@ -1,0 +1,35 @@
+# Production Docker Compose configuration for dji.sartrainer.org
+services:
+  dji-mapper:
+    image: dji-mapper:latest
+    container_name: dji-mapper
+    # No build step - uses pre-built image
+    # No port mapping needed - uses Docker network for Caddy
+    networks:
+      - proxy-network
+    restart: unless-stopped
+    # Resource limits for production
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    # Custom logging driver
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+
+networks:
+  proxy-network:
+    external: true

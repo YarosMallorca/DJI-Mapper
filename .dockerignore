@@ -1,0 +1,46 @@
+# Git files
+.git
+.gitignore
+.github
+
+# Build directories (keep build/web for local builds)
+!build/web
+build/linux
+build/windows
+build/macos
+build/android
+build/ios
+.dart_tool
+.metadata
+.packages
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Flutter/Dart files
+pubspec.lock
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Documentation
+*.md
+!README.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+test
+coverage
+
+# Firebase
+firebase.json
+.firebaserc
+
+# Production docker-compose is kept
+!docker-compose.prod.yml
